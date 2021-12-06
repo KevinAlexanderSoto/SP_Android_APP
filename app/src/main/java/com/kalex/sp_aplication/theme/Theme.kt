@@ -1,4 +1,4 @@
-package com.kalex.sp_aplication.ui.theme
+package com.kalex.sp_aplication.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

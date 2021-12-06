@@ -1,4 +1,4 @@
-package com.kalex.sp_aplication.ui.theme
+package com.kalex.sp_aplication.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
