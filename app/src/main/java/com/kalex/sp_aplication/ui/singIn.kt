@@ -1,11 +1,14 @@
 package com.kalex.sp_aplication.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
@@ -16,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -32,12 +36,14 @@ import com.kalex.sp_aplication.theme.spcolor
 
 @Composable fun SingIn(
 
-    signin : (email : String ,password :String) -> Unit
+    signin : (email : String ,password :String) -> Boolean?
 
 ){
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),// para hacer scroll
+        verticalArrangement = Arrangement.spacedBy(11.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LogoSP()
@@ -90,7 +96,7 @@ fun LogoSP() {
         modifier = Modifier
             .height(210.dp)
             .width(350.dp)
-            .padding(20.dp)
+            .padding(15.dp)
     )
 }
 
@@ -117,6 +123,7 @@ fun EmailField(
 
     TextField(
         value = text,
+        singleLine = true,
         onValueChange = { onEmailChanged(it)},
         label = { Text(text = "Email") },
         placeholder = { Text("example@gmail.com") },
@@ -155,8 +162,6 @@ fun PasswordFiels(
     onAction: () -> Unit,
     onPasswordChange: (String) -> Unit
 ) {
-    //val password = rememberSaveable { mutableStateOf("") }
-
     TextField(
         value = pass,
         onValueChange = { onPasswordChange(it) },
@@ -179,14 +184,24 @@ fun PasswordFiels(
             onAction()
         }),
 
-
     )
 }
 
 @Composable
-fun Buttonin(habilitado: Boolean,signin :()->Unit) {
+fun Buttonin(habilitado: Boolean,signin :()->Boolean?) {
+    val context = LocalContext.current
     Button(
-        onClick = {signin()},
+        onClick = {
+            var acceso = signin()
+                  if (acceso == true){
+                      Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
+
+                  }else if(acceso == false){
+                      Toast.makeText(context,"Acceso Denegado",Toast.LENGTH_LONG).show()
+
+                  }
+
+                  },
         modifier = Modifier
             .padding(top = 30.dp)
             .fillMaxWidth(0.8f),
@@ -210,7 +225,7 @@ fun Buttonin(habilitado: Boolean,signin :()->Unit) {
 
 @Composable
 fun ButtonHuella(habilitado : Boolean) {
-    Button(
+    OutlinedButton(
         onClick = { /*TODO*/ },
         modifier = Modifier
             .padding(vertical = 10.dp)
@@ -218,16 +233,10 @@ fun ButtonHuella(habilitado : Boolean) {
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = spcolor,
-            contentColor = blanco
-        ),
         enabled = habilitado
     ) {
         ButtonIcon(R.drawable.baseline_fingerprint_24,35)
-
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-
         ButtonText("Ingresar con huella")
 
 
