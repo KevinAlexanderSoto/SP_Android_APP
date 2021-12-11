@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.kalex.sp_aplication.Emailvalidation
 import com.kalex.sp_aplication.R
+import com.kalex.sp_aplication.composables.ButtonText
+import com.kalex.sp_aplication.composables.Icono
+import com.kalex.sp_aplication.composables.Imagen
 import com.kalex.sp_aplication.theme.blanco
 import com.kalex.sp_aplication.theme.spcolor
 
@@ -46,7 +49,11 @@ import com.kalex.sp_aplication.theme.spcolor
         verticalArrangement = Arrangement.spacedBy(11.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LogoSP()
+        Imagen(url = R.drawable.logo_sophos_home, modifier = Modifier
+            .height(210.dp)
+            .width(350.dp)
+            .padding(15.dp) )
+
         Textfield("Ingresa tus datos para acceder")
 
         // manejar focus de los texto,
@@ -82,22 +89,6 @@ import com.kalex.sp_aplication.theme.spcolor
     }
 
 
-}
-
-
-@Composable
-fun LogoSP() {
-    Image(
-        painter = rememberImagePainter(
-            data = R.drawable.logo_sophos_home,
-            builder = { crossfade(true) }
-        ),
-        contentDescription = "Logo SP",
-        modifier = Modifier
-            .height(210.dp)
-            .width(350.dp)
-            .padding(15.dp)
-    )
 }
 
 @Composable
@@ -204,7 +195,8 @@ fun Buttonin(habilitado: Boolean,signin :()->Boolean?) {
                   },
         modifier = Modifier
             .padding(top = 30.dp)
-            .fillMaxWidth(0.8f),
+            .fillMaxWidth(0.8f)
+        ,
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(23.dp),
         contentPadding = PaddingValues(12.dp),
@@ -215,9 +207,9 @@ fun Buttonin(habilitado: Boolean,signin :()->Boolean?) {
         enabled = habilitado
     ) {
 
-        ButtonIcon(R.drawable.outline_login_24,30)
+        Icono(R.drawable.outline_login_24,30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar")
+        ButtonText("Ingresar",22)
 
     }
 }
@@ -235,29 +227,13 @@ fun ButtonHuella(habilitado : Boolean) {
         shape = RoundedCornerShape(23.dp),
         enabled = habilitado
     ) {
-        ButtonIcon(R.drawable.baseline_fingerprint_24,35)
+        Icono(R.drawable.baseline_fingerprint_24,35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar con huella")
+        ButtonText("Ingresar con huella",22)
 
 
     }
 }
 
-@Composable
-fun ButtonIcon(url : Any, valor: Int) {
-    Icon(
-        painter = rememberImagePainter(url),
-        contentDescription = null,
-        modifier = Modifier.size(valor.dp),
-    )
-}
 
-@Composable
- fun ButtonText(msg:String ) {
-    Text(
-        text = msg,
-        fontSize = 22.sp,
-
-        )
-}
 

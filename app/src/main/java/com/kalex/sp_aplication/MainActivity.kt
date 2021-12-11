@@ -35,8 +35,9 @@ class MainActivity : ComponentActivity() {
                             viewModel.respuesta
                         }
                     }
-                    composable("home/{nombre}"){
+                    composable("home"){
                         Home()
+
                     }
                     composable("enviarDoc"){
                         Home()

@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2101851851851852" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/baseline_fingerprint_24.xml" value="0.240625" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/outline_login_24.xml" value="0.1925925925925926" />
       </map>
