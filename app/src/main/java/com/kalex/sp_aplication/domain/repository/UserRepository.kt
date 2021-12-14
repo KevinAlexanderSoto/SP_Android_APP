@@ -10,5 +10,5 @@ interface UserRepository {
 
     suspend fun getDocuments(idRegistro : Int,correo : String) : DocumentDto
 
-    suspend fun getOfice(ciudad : String) : OficeDto
+    suspend fun getOfices(ciudad : String) : OficeDto
 }

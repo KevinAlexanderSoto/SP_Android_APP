@@ -27,12 +27,4 @@ interface UserRetroApi {
         @Query("ciudad") ciudad : String
     ): OficeDto
 
-    @GET("RS_Oficinas")
-    suspend fun getOfices(
-    ): OficeDto
-
-    @POST
-    suspend fun postDocument(
-
-    )
 }

@@ -4,16 +4,17 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOficeUseCase
 import com.kalex.sp_aplication.presentation.states.OficeState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-class OficeViewModel@Inject constructor(
+@HiltViewModel
+class OficeViewModel @Inject constructor(
     private val getOficeUseCase: GetOficeUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel(){

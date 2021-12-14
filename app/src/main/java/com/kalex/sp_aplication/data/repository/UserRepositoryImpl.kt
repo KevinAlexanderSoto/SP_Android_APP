@@ -19,7 +19,7 @@ class UserRepositoryImpl @Inject constructor(
         return api.getDocuments(idRegistro ,correo)
     }
 
-    override suspend fun getOfice(ciudad: String): OficeDto {
+    override suspend fun getOfices(ciudad: String): OficeDto {
        return api.getOfices(ciudad)
     }
 }

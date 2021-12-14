@@ -192,8 +192,7 @@ fun Buttonin(habilitado: Boolean, viewModel: UserViewModel, navController: NavCo
     Button(
         onClick = {
             var resp = viewModel.state.value
-            println("Se Hizo click")
-            println("respuesta --${resp.user}")
+
             resp.user?.let {user ->
                 var acceso = user.acceso
                 println("acceso $acceso")

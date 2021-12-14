@@ -13,16 +13,16 @@ fun Navegacion(){
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Constants.MainNavItem)
+        startDestination = Constants.HomeNavItem)
     {
         composable(Constants.MainNavItem){
             SingIn(navController)
         }
         composable(Constants.HomeNavItem){
-            backStackEntry->
+           /* backStackEntry->
                 val nombre= backStackEntry.arguments?.getString("nombre")
-            requireNotNull(nombre)
-            Home(navController ,nombre)
+            requireNotNull(nombre)*/
+            Home(navController ,"nombre")
 
         }
         composable(Constants.SendDocNavItem){
