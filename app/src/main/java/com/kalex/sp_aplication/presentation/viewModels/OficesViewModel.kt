@@ -2,11 +2,10 @@ package com.kalex.sp_aplication.presentation.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
-import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOficeUseCase
+import com.kalex.sp_aplication.domain.use_case.get_ofices.GetOficesUseCase
 import com.kalex.sp_aplication.presentation.states.OficeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -14,23 +13,21 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class OficeViewModel @Inject constructor(
-    private val getOficeUseCase: GetOficeUseCase,
-    savedStateHandle: SavedStateHandle
+class OficesViewModel @Inject constructor(
+    private val getOficesUseCase: GetOficesUseCase
+
 ): ViewModel(){
 
     private val _state = mutableStateOf(OficeState())
     val state: State<OficeState> = _state
 
     init {
-        getOfice("Medellín")
-        savedStateHandle.get<String>("ciudad")?.let { ciudad ->
-            getOfice(ciudad)
-        }
+        getOfices()
+
     }
 
-    private fun getOfice(ciudad:String) {
-        getOficeUseCase(ciudad).onEach { result ->
+    private fun getOfices() {
+        getOficesUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = OficeState(ofices = result.data)

@@ -24,21 +24,21 @@ class UserViewModel @Inject constructor(
 
     private val _state = mutableStateOf(UserState())
     val state: State<UserState> = _state
-
+    val savedStateHandle = savedStateHandle
     init {
 
-        /*var iduser:String=""
+        var iduser:String=""
         savedStateHandle.get<String>("idUsuario")?.let { Id ->
             iduser = Id
         }
         savedStateHandle.get<String>("clave")?.let { clave ->
             //getUser(iduser,clave)
-        }*/
+        }
     }
 
      fun getUser(email: Emailvalidation, contraseña: MutableState<String>) {
          runBlocking {
-        getUserUseCase(email.text,contraseña.value).onEach { result ->
+        getUserUseCase(email.correo,contraseña.value).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     println("data en user view model --${result.data}")

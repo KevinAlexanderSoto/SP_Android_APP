@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
-/*
+
 class GetOficesUseCase  @Inject constructor(
         private val repository: UserRepository // injectamos la interface
     ){
         operator fun invoke() : Flow<Resource<Ofice>> = flow{
             try {
                 emit(Resource.Loading<Ofice>())
-                var ofices =  repository.getAllOfice().toOfice()
+                var ofices =  repository.getAllOfices().toOfice()
 
                 emit(Resource.Success<Ofice>(ofices))
             }catch (e: HttpException){
@@ -25,4 +25,4 @@ class GetOficesUseCase  @Inject constructor(
                 emit(Resource.Error<Ofice>("error internet connection"))
             }
         }
-    }*/
+    }

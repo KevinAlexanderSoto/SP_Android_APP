@@ -22,50 +22,101 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.kalex.sp_aplication.presentation.composables.ButtonText
+import com.kalex.sp_aplication.presentation.composables.Drawer
+import com.kalex.sp_aplication.presentation.viewModels.OficesViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun enviarDocumento(
-    navController: NavHostController
+fun EnviarDocumento(
+    navController: NavHostController,
+    oficesViewModel: OficesViewModel = hiltViewModel()
 ) {
-    ToolBar(navController)
+    var resp = oficesViewModel.state.value
+
+    //para barra lateral
+    val scaffoldState = rememberScaffoldState(
+        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    )
+    val scope = rememberCoroutineScope()
+
+
+    //barra de cargando
+    if (resp.isLoading){
+        Box(modifier = Modifier.fillMaxSize()
+            , contentAlignment = Alignment.Center
+        ){
+            CircularProgressIndicator(modifier = Modifier
+                .fillMaxSize(0.1f)
+
+            )
+        }
+    }
+    //Logica para obtener ciudades de la API
+    if (!resp.isLoading) {
+        var ciudades = ArrayList<String>()
+        for (ciudad in resp.ofices?.Items!!) {
+            if (!ciudades.contains(ciudad.Ciudad)){
+            ciudades.add(ciudad.Ciudad)}
+        }
+
+        ToolBar(navController,ciudades,scope,scaffoldState)
+    }
+
 }
 @Composable
 fun ToolBar(
-    navController :NavHostController
+    navController :NavHostController,
+    ciudades:ArrayList<String>,
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState
 ){
-    Scaffold(topBar = {
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
         TopAppBar(
             title = { Text(text = "Envio de Documentación") },
-            navigationIcon ={
+            navigationIcon = {
                 IconButton(onClick = {
                     navController.popBackStack()
                 }
-                //modifier = Modifier.padding(horizontal = 20.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "go back"
-                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "go back"
+                    )
                 }
             },
             actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Menu,
-                        contentDescription = "menu hamburgesa")
+                IconButton(onClick = {
+                    scope.launch {
+                    scaffoldState.drawerState.open()
+                } }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "menu hamburgesa"
+                    )
                 }
             },
-            //backgroundColor = Color.White
         )
-    }) {
-        FormularioDoc(navController )
+    },
+        drawerContent = { Drawer(scope, scaffoldState, navController) },
+        drawerGesturesEnabled = true
+
+        ) {
+        FormularioDoc(navController,ciudades )
     }
 }
 
 @Composable
-fun FormularioDoc(navController :NavHostController) {
+fun FormularioDoc(navController :NavHostController,
+                  ciudades:ArrayList<String>
+
+                  ) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +132,7 @@ fun FormularioDoc(navController :NavHostController) {
         InputText(label = "Nombre")
         InputText(label = "Apellido")
         ButtonText(msg="Aqui va el correo")
-        dropDownMenu(listaDocumento, nombreInput = "Ciudad")
+        dropDownMenu(ciudades, nombreInput = "Ciudad")
         dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
 
     }
@@ -96,7 +147,8 @@ label : String
         value = text,
         onValueChange = { text = it },
         label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(0.9f)
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
             .background(Color.White),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done
@@ -108,8 +160,10 @@ label : String
 }
 
 @Composable
-fun dropDownMenu(listaDocumento: List<String>,
-                 nombreInput:String) {
+fun dropDownMenu(
+    listaDocumento: List<String>,
+    nombreInput:String)
+{
 
     var expanded by remember { mutableStateOf(false) }
     val suggestions = listaDocumento

@@ -68,7 +68,7 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
         val text = remember { Emailvalidation() }
 
         EmailField(
-            text.text,
+            text.correo,
             text.error,
             onAction = {
                 // bajar al siguiente field
@@ -76,7 +76,7 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
             }
         ){
 
-            text.text = it
+            text.correo = it
             text.validate()
         }
 
@@ -199,6 +199,9 @@ fun Buttonin(habilitado: Boolean, viewModel: UserViewModel, navController: NavCo
                // println("respuesta${resp.user}")
                 if (acceso == true){
                     Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
+
+
+                    viewModel.savedStateHandle["nombre"] = resp.user?.nombre
                     navController.navigate("home/${resp.user?.nombre}")
                 }else if(acceso == false){
                     Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()

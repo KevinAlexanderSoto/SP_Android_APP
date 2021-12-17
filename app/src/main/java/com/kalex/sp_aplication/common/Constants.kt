@@ -7,5 +7,6 @@ object Constants {
     const val  SendDocNavItem = "senddoc"
     const val  oficesNavItem = "getofices"
     const val  getDocNavItem = "getdoc"
+    const val  getDocDetailNavItem = "getdocdetail/{idregistro}"
 
 }

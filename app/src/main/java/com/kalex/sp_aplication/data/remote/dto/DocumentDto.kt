@@ -10,8 +10,7 @@ data class DocumentDto(
 
 fun DocumentDto.toDocument(): Document {
     return Document(
-        Count = Count,
         Items =  Items.map { it.toItem() },
-        ScannedCount = ScannedCount
+
     )
 }

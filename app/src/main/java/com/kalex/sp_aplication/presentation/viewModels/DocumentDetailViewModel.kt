@@ -6,46 +6,44 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
+import com.kalex.sp_aplication.domain.use_case.get_documentDetail.GetDocumentDetailUseCase
 import com.kalex.sp_aplication.domain.use_case.get_documents.GetDocumentsUseCase
+import com.kalex.sp_aplication.presentation.states.DocumentDetailState
 import com.kalex.sp_aplication.presentation.states.DocumentState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
-class DocumentViewModel @Inject constructor(
-    private val getDocumentsUseCase: GetDocumentsUseCase,
-    savedStateHandle: SavedStateHandle,
+class DocumentDetailViewModel @Inject constructor(
+    private val getDocumentDetailUseCase: GetDocumentDetailUseCase,
+    savedStateHandle: SavedStateHandle
 ): ViewModel(){
 
-    private val _state = mutableStateOf(DocumentState())
-    val state: State<DocumentState> = _state
+    private val _state = mutableStateOf(DocumentDetailState())
+    val state: State<DocumentDetailState> = _state
 
-   init{
-       println("keys guardadas"+savedStateHandle.keys())
-       savedStateHandle.get<String>("correo")?.let {correo->
-           getDocuments(correo)
-       }
+    init {
 
+        savedStateHandle.get<String>("idRegistro")?.let { registro ->
+            getDocument(registro)
+        }
     }
 
-    private fun getDocuments(email : String  ) {
-
-        getDocumentsUseCase(email).onEach { result ->
-            println("DENTRO DE FUNCION ")
+    private fun getDocument(iddoc: String) {
+        getDocumentDetailUseCase(iddoc).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = DocumentState(document = result.data)
+                    _state.value = DocumentDetailState(document = result.data)
                 }
                 is Resource.Error -> {
-                    _state.value = DocumentState(
+                    _state.value = DocumentDetailState(
                         error = result.message ?: "An unexpected error occured"
                     )
                 }
                 is Resource.Loading -> {
-                    _state.value = DocumentState(isLoading = true)
+                    _state.value = DocumentDetailState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

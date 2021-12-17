@@ -6,18 +6,18 @@ import androidx.compose.runtime.setValue
 import java.util.regex.Pattern
 
 class Emailvalidation() {
-    var text by mutableStateOf("")
+    var correo by mutableStateOf("")
     private val errorMessage : String = "Correo no valido "
     var error by mutableStateOf<String?>(null)
 
     fun validate(){
-        error = if (isEmailValid(text)){
+        error = if (isEmailValid(correo)){
             null
         }else {
             errorMessage
         }
     }
-    fun valid ():Boolean = isEmailValid(text);
+    fun valid ():Boolean = isEmailValid(correo);
 }
 
 private const val EMAIL_REGEX = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})\$"

@@ -10,45 +10,66 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
-import com.kalex.sp_aplication.presentation.composables.ButtonText
-import com.kalex.sp_aplication.presentation.composables.Icono
-import com.kalex.sp_aplication.presentation.composables.IconoVector
-import com.kalex.sp_aplication.presentation.composables.Imagen
+import com.kalex.sp_aplication.presentation.composables.*
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
+import com.kalex.sp_aplication.presentation.viewModels.DocumentViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable fun Home(
     navController: NavController,
-    nombre: String
+    nombre: String,
+
 ){
-    ToolBar(nombre = nombre,navController)
+
+    val scaffoldState = rememberScaffoldState(
+        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    )
+    val scope = rememberCoroutineScope()
+
+    ToolBar(nombre = nombre,navController,scope,scaffoldState)
 
 }
 @Composable
 fun ToolBar(
     nombre:String,
-    navController: NavController
+    navController: NavController,
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState
 ){
-    Scaffold(topBar = {
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
         TopAppBar(
             title = { Text(text = nombre)},
             actions = {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    scope.launch {
+                        scaffoldState.drawerState.open()
+                    }
+                }) {
                     Icon(imageVector = Icons.Default.Menu,
                         contentDescription = "menu hamburgesa")
                 }
             },
-            //backgroundColor = Color.White
         )
-    }) {
+    }, drawerContent = { Drawer(scope, scaffoldState, navController,) },
+        drawerGesturesEnabled = true
+
+        ) {
         padding->
         Contenido(navController)
     }

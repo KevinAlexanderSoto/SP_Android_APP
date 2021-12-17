@@ -14,16 +14,16 @@ import javax.inject.Inject
 class GetOficeUseCase @Inject constructor(
     private val repository: UserRepository // injectamos la interface
 ){
-    operator fun invoke(ciudad: String) : Flow<Resource<OficeDto>> = flow{
+    operator fun invoke(ciudad: String) : Flow<Resource<Ofice>> = flow{
         try {
-            emit(Resource.Loading<OficeDto>())
-            var ofices =  repository.getOfices(ciudad)
+            emit(Resource.Loading<Ofice>())
+            var ofices =  repository.getOfices(ciudad).toOfice()
 
-            emit(Resource.Success<OficeDto>(ofices))
+            emit(Resource.Success<Ofice>(ofices))
         }catch (e: HttpException){
-            emit(Resource.Error<OficeDto>(e.localizedMessage ?: "an unexpeted error occured"))
+            emit(Resource.Error<Ofice>(e.localizedMessage ?: "an unexpeted error occured"))
         }catch (e: IOException){ // no puede comunicarse sin internet por ejemplo
-            emit(Resource.Error<OficeDto>("error internet connection"))
+            emit(Resource.Error<Ofice>("error internet connection"))
         }
     }
 }

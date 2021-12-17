@@ -5,6 +5,6 @@ import com.kalex.sp_aplication.domain.model.Ofice
 
 data class OficeState(
     val isLoading:Boolean = false,
-    val ofices: OficeDto? = null,
+    val ofices: Ofice? = null,
     val error:String = ""
 )

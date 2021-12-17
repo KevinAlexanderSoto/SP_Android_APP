@@ -10,8 +10,6 @@ data class OficeDto(
 
 fun OficeDto.toOfice(): Ofice {
     return Ofice(
-         Count= Count,
-     Items= Items.map { it.toItemOfice() },
-     ScannedCount= ScannedCount
+     Items= Items.map { it.toItemOfice() }
     )
 }
