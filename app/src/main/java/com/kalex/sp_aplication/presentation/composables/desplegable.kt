@@ -17,9 +17,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
+import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -27,9 +29,13 @@ import kotlinx.coroutines.launch
 fun Drawer(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
-    navController: NavController
-
+    navController: NavController,
+    viewModel : DataViewModel = hiltViewModel()
 ) {
+    //obtener nombre , para que se vuelva a pintar
+    viewModel.settingsPrefs
+    var nombre = viewModel.nombre
+
     Column {
         Image(
             painter = painterResource(id = R.drawable.hacemosquepase),
@@ -44,8 +50,8 @@ fun Drawer(
             .fillMaxWidth()
             .height(15.dp))
 
-            DrawerItem(texto = "Home", R.drawable.home_24) {
-                navController.navigate("home/{nombre}") {
+            DrawerItem(texto = "Menú principal", R.drawable.home_24) {
+                navController.navigate("home/$nombre") {
                     launchSingleTop = true
                 }
                 scope.launch {

@@ -1,10 +1,10 @@
 package com.kalex.sp_aplication.data.remote
 
-import com.kalex.sp_aplication.data.remote.dto.DocumentDetailDto
-import com.kalex.sp_aplication.data.remote.dto.DocumentDto
-import com.kalex.sp_aplication.data.remote.dto.OficeDto
-import com.kalex.sp_aplication.data.remote.dto.Userdto
+import com.kalex.sp_aplication.data.remote.dto.*
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -16,6 +16,11 @@ interface UserRetroApi {
         @Query("idUsuario") idUsuario : String,
         @Query("clave") clave : String
     ): Userdto
+
+    @POST("RS_Documentos")
+    suspend fun postDocument(
+        @Body requestBody: RequestBody
+    ): postDocumentDto
 
     @GET("RS_Documentos")
     suspend fun getDocuments(

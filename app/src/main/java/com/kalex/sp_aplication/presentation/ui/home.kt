@@ -9,32 +9,24 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.composables.*
 import com.kalex.sp_aplication.presentation.theme.blanco
-import com.kalex.sp_aplication.presentation.theme.spcolor
-import com.kalex.sp_aplication.presentation.viewModels.DocumentViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @Composable fun Home(
     navController: NavController,
-    nombre: String,
-
+    nombre : String,
 ){
-
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     )
@@ -45,7 +37,7 @@ import kotlinx.coroutines.launch
 }
 @Composable
 fun ToolBar(
-    nombre:String,
+    nombre: String,
     navController: NavController,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState
@@ -158,9 +150,6 @@ fun Card(
                     IconoVector(Icons.Default.ArrowForward,20)
                 }
             }
-
         }
-        
     }
 }
-

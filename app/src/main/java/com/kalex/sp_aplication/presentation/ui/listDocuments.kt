@@ -24,24 +24,19 @@ import com.kalex.sp_aplication.domain.model.Item
 import com.kalex.sp_aplication.presentation.composables.DocumentListItem
 import com.kalex.sp_aplication.presentation.composables.Drawer
 import com.kalex.sp_aplication.presentation.viewModels.DocumentViewModel
+import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun VerDocumentos(navController: NavHostController,
-viewModel: DocumentViewModel = hiltViewModel()
+viewModel: DocumentViewModel = hiltViewModel(),
 ) {
-
-    //println(viewModel.savedStateHandle.keys())
-
-    //println("el correo es :"+viewModel.savedStateHandle.get<String>("correo"))
-
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     )
     val scope = rememberCoroutineScope()
-    //viewModel.getDocuments("kevinalexandersoto999@gmail.com")
     //get documentos
     var resp = viewModel.state.value
     //barra de cargando

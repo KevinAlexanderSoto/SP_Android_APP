@@ -6,19 +6,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kalex.sp_aplication.Emailvalidation
+import com.kalex.sp_aplication.presentation.validations.Emailvalidation
 import com.kalex.sp_aplication.common.Resource
+import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
 import com.kalex.sp_aplication.domain.use_case.get_users.GetUserUseCase
 import com.kalex.sp_aplication.presentation.states.UserState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
+    private val settingsDataStore: SettingsDataStore,
     savedStateHandle: SavedStateHandle
 ):ViewModel(){
 
@@ -34,6 +37,7 @@ class UserViewModel @Inject constructor(
         savedStateHandle.get<String>("clave")?.let { clave ->
             //getUser(iduser,clave)
         }
+
     }
 
      fun getUser(email: Emailvalidation, contraseña: MutableState<String>) {
@@ -54,5 +58,11 @@ class UserViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)}
+    }
+
+    fun saveAll(nombre: String,correo: String,contraseña: String){
+        viewModelScope.launch {
+            settingsDataStore.saveAll(nombre,correo,contraseña)
+        }
     }
 }

@@ -6,32 +6,37 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
+import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
 import com.kalex.sp_aplication.domain.use_case.get_documents.GetDocumentsUseCase
 import com.kalex.sp_aplication.presentation.states.DocumentState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
+
 import javax.inject.Inject
 
 @HiltViewModel
 class DocumentViewModel @Inject constructor(
     private val getDocumentsUseCase: GetDocumentsUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val settingsDataStore: SettingsDataStore
+    /*viewmodelData : DataViewModel*/
 ): ViewModel(){
 
     private val _state = mutableStateOf(DocumentState())
     val state: State<DocumentState> = _state
-
+    var dato :String = ""
    init{
-       println("keys guardadas"+savedStateHandle.keys())
+       val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
+           dato = result.correo
+       }.launchIn(viewModelScope)
+       /*println("keys guardadas"+savedStateHandle.keys())
        savedStateHandle.get<String>("correo")?.let {correo->
-           getDocuments(correo)
-       }
-
+       }*/
+       getDocuments(dato)
     }
 
-    private fun getDocuments(email : String  ) {
+    private fun getDocuments(email: String) {
 
         getDocumentsUseCase(email).onEach { result ->
             println("DENTRO DE FUNCION ")

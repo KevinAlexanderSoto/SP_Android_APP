@@ -11,10 +11,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -27,23 +25,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
-import com.kalex.sp_aplication.Emailvalidation
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Icono
 import com.kalex.sp_aplication.presentation.composables.Imagen
-import com.kalex.sp_aplication.presentation.states.UserState
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
+import com.kalex.sp_aplication.presentation.validations.Emailvalidation
 import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 
 
 @Composable fun SingIn(
     navController: NavController,
     viewModel : UserViewModel = hiltViewModel(),
-   // savedStateHandle: SavedStateHandle
+
 ){
 
     Column(
@@ -91,9 +87,9 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 
         viewModel.getUser(text,password)
         //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController )
+        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
 
-        ButtonHuella(text.valid())
+        ButtonHuella(text.valid())//,onfinger
     }
 
 
@@ -187,7 +183,13 @@ fun PasswordFiels(
 }
 
 @Composable
-fun Buttonin(habilitado: Boolean, viewModel: UserViewModel, navController: NavController) {
+fun Buttonin(
+    habilitado: Boolean,
+    viewModel: UserViewModel,
+    navController: NavController,
+    correo: String,
+    contraseña :String
+) {
     val context = LocalContext.current
     Button(
         onClick = {
@@ -198,11 +200,11 @@ fun Buttonin(habilitado: Boolean, viewModel: UserViewModel, navController: NavCo
                 println("acceso $acceso")
                // println("respuesta${resp.user}")
                 if (acceso == true){
+
                     Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
-
-
-                    viewModel.savedStateHandle["nombre"] = resp.user?.nombre
+                    viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
                     navController.navigate("home/${resp.user?.nombre}")
+
                 }else if(acceso == false){
                     Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
 
@@ -234,16 +236,16 @@ fun Buttonin(habilitado: Boolean, viewModel: UserViewModel, navController: NavCo
 
 
 @Composable
-fun ButtonHuella(habilitado : Boolean) {
+fun ButtonHuella(habilitado: Boolean,) {//,
     OutlinedButton(
-        onClick = { /*TODO*/ },
+        onClick = {  },
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        enabled = habilitado
+        //enabled = habilitado
     ) {
         Icono(R.drawable.baseline_fingerprint_24,35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
@@ -252,6 +254,3 @@ fun ButtonHuella(habilitado : Boolean) {
 
     }
 }
-
-
-

@@ -1,19 +1,31 @@
 package com.kalex.sp_aplication.presentation
 
+import android.Manifest
+import android.app.KeyguardManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.hardware.biometrics.BiometricPrompt
+import android.os.Build
 import android.os.Bundle
+import android.os.CancellationSignal
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.SavedStateHandle
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.kalex.sp_aplication.R
 
 import com.kalex.sp_aplication.presentation.navigation.Navegacion
 
 import com.kalex.sp_aplication.presentation.theme.SPAplicationTheme
 
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity () {
+
+    @ExperimentalPermissionsApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -22,5 +34,6 @@ class MainActivity : ComponentActivity () {
             }
         }
     }
+
 }
 

@@ -1,13 +1,14 @@
 package com.kalex.sp_aplication.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.ui.*
 
+@ExperimentalPermissionsApi
 @Composable
 fun Navegacion() {
     val navController = rememberNavController()
@@ -18,7 +19,8 @@ fun Navegacion() {
         composable(Constants.MainNavItem){
             SingIn(navController)
         }
-        composable(Constants.HomeNavItem){
+        composable(Constants.HomeNavItem
+        ){
           backStackEntry->
                val nombre= backStackEntry.arguments?.getString("nombre")
             requireNotNull(nombre)
@@ -33,9 +35,9 @@ fun Navegacion() {
         }
         composable(Constants.getDocDetailNavItem){
                 backStackEntry->
-            val nombre= backStackEntry.arguments?.getString("idregistro")
-            requireNotNull(nombre)
-            VerDocumento(navController, idRegistro = nombre)
+            val idRegistro= backStackEntry.arguments?.getString("idRegistro")
+            requireNotNull(idRegistro)
+            VerDocumento(navController, idRegistro = idRegistro)
         }
         composable(Constants.oficesNavItem){
             VerOficinas(navController)

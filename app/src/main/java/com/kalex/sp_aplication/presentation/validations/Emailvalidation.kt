@@ -1,4 +1,4 @@
-package com.kalex.sp_aplication
+package com.kalex.sp_aplication.presentation.validations
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
