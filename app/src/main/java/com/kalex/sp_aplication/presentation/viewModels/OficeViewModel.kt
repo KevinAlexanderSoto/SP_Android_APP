@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOficeUseCase
 import com.kalex.sp_aplication.presentation.states.OficeState
@@ -21,7 +22,7 @@ class OficeViewModel @Inject constructor(
 
     private val _state = mutableStateOf(OficeState())
     val state: State<OficeState> = _state
-
+    val userLocation : LatLng? = null
     init {
         getOfice("Medellín")
         savedStateHandle.get<String>("ciudad")?.let { ciudad ->

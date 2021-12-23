@@ -77,9 +77,6 @@ fun EnviarDocumento(
     )
     val scope = rememberCoroutineScope()
 
-    val sendDoc = postDocumentViewModel.state
-    println("repsuesta del PUT  $sendDoc")
-
     //barra de cargando
     if (resp.isLoading){
         Box(modifier = Modifier.fillMaxSize()
@@ -180,12 +177,10 @@ fun FormularioDoc(
         Spacer(Modifier.size(4.dp))
 
         val menu1= dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
-
         val text1 :String = InputText(label = "Numero de documento")
         val text2 = InputText(label = "Nombre")
         val text3 = InputText(label = "Apellido")
         val text4 = InputText(label = "Correo",correo)
-
         val menu2=dropDownMenu(ciudades, nombreInput = "Ciudad")
         val menu3=dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
 
@@ -200,11 +195,11 @@ fun FormularioDoc(
                     .fillMaxWidth(0.9f)
                     .padding(4.dp)
             ){
-            cargarFoto= BtncargarImg("Cargar img")
+            cargarFoto= BtncargarImg("Cargar img",R.drawable.cloud_upload_24)
 
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                 tomarFoto= BtncargarImg("Tomar foto")
+                tomarFoto= BtncargarImg("Tomar foto",R.drawable.add_a_photo_24)
 
             }
 
@@ -419,7 +414,7 @@ fun BtnEnviarImg(
         enabled = validacion
     ) {
 
-        Icono(R.drawable.outline_login_24,25)
+        Icono(R.drawable.send_24,25)
         Spacer(Modifier.size(4.dp))
         ButtonText("Enviar",20)
 
@@ -430,6 +425,7 @@ fun BtnEnviarImg(
 @Composable
 fun BtncargarImg(
     texto: String,
+    icono :Any
 ):Boolean{
 
     var click by remember { mutableStateOf(false) }
@@ -450,7 +446,7 @@ fun BtncargarImg(
         enabled = true
     ) {
 
-        Icono(R.drawable.outline_login_24,25)
+        Icono(icono,20)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText(texto,15)
 
@@ -459,7 +455,7 @@ fun BtncargarImg(
     return click
 }
 
-//funcion para capturar img y validar su tamaño
+//funcion para capturar img
 @ExperimentalPermissionsApi
 @Composable
 fun capturaraImg(
@@ -502,14 +498,15 @@ fun capturaraImg(
                     imageUri = file.toUri()
                     //-------------------validaciones para tamaño de imagenes---------------------------
                     val uriSize = imageUri.toFile().getFileSizeFloat()
-                    if (uriSize > 1000) {
+                    //Validacion de Tamaño , pero no es necesaria , ya que al comprimir la IMG se setea el tamaño
+                   /* if (uriSize > 1000) {
                         Toast.makeText(
                             context,
                             "Imagen demaciado pesada,toma otra foto",
                             Toast.LENGTH_LONG
                         ).show()
                         imageUri = EMPTY_IMAGE_URI
-                    }
+                    }*/
                 }
             )
     }
@@ -556,7 +553,7 @@ fun capturaraImgGaleria(
             modifier = modifier,
             onImageUri = { uri ->
                 imageUri = uri
-                //-------------------validaciones para tamaño de imagenes---------------------------
+
             }
         )
     }

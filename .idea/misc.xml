@@ -4,12 +4,16 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2101851851851852" />
+        <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/add_a_photo_24.xml" value="0.23692307692307693" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/baseline_fingerprint_24.xml" value="0.240625" />
+        <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/cloud_upload_24.xml" value="0.23692307692307693" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/home_24.xml" value="0.1" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/location_on_24.xml" value="0.1" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/logout_20.xml" value="0.1" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/outline_login_24.xml" value="0.1925925925925926" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/plagiarism_24.xml" value="0.1" />
+        <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/send_24.xml" value="0.23692307692307693" />
+        <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/upload_file_20.xml" value="0.17777777777777778" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/drawable/upload_file_24.xml" value="0.1" />
         <entry key="..\:/Users/kevin/AndroidStudioProjects/SPAplication/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
       </map>

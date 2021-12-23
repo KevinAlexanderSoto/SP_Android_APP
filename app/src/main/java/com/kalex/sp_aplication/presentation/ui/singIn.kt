@@ -34,6 +34,9 @@ import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
 import com.kalex.sp_aplication.presentation.validations.Emailvalidation
 import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @Composable fun SingIn(
@@ -82,7 +85,7 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
         { password.value = it
         }
 
-        viewModel.getUser(text,password)
+        viewModel.getUser(text.correo,password.value)
         //var resp = viewModel.state.value
         Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
 
@@ -190,24 +193,34 @@ fun Buttonin(
     val context = LocalContext.current
     Button(
         onClick = {
+            runBlocking {
+                launch {
+                    delay(100L)
+                }
+            }
+
             var resp = viewModel.state.value
 
-            resp.user?.let {user ->
-                var acceso = user.acceso
-                println("acceso $acceso")
-               // println("respuesta${resp.user}")
-                if (acceso == true){
+               //println("Respuesta de server: $resp")
+                resp.user?.let {user ->
+                    val acceso = user.acceso
+                    println("acceso $acceso")
+                    // println("respuesta${resp.user}")
+                    if (acceso == true){
 
-                    Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
-                    viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
-                    navController.navigate("home/${resp.user?.nombre}")
+                        Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
+                        viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
+                        navController.navigate("home/${resp.user?.nombre}")
 
-                }else if(acceso == false){
-                    Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
+                    }else if(acceso == false){
+                        Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
+
+                    }
 
                 }
 
-            }
+
+
                   },
         modifier = Modifier
             .padding(top = 30.dp)

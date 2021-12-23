@@ -30,22 +30,29 @@ class UserViewModel @Inject constructor(
     val savedStateHandle = savedStateHandle
     init {
 
-        var iduser:String=""
+        /*var iduser:String=""
         savedStateHandle.get<String>("idUsuario")?.let { Id ->
             iduser = Id
         }
         savedStateHandle.get<String>("clave")?.let { clave ->
             //getUser(iduser,clave)
-        }
+        }*/
 
     }
+    //Emailvalidation   MutableState<String>
+     fun getUser(email:String , contraseña:String ) {
+        var realcontraseña:String
+        // po si el usuario no coloca contraseña
+        if (contraseña ==""){
+             realcontraseña = "no"
+        }else{
+             realcontraseña = contraseña
+        }
 
-     fun getUser(email: Emailvalidation, contraseña: MutableState<String>) {
-         runBlocking {
-        getUserUseCase(email.correo,contraseña.value).onEach { result ->
+        getUserUseCase(email,realcontraseña).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    println("data en user view model --${result.data}")
+
                     _state.value = UserState(user = result.data)
                 }
                 is Resource.Error -> {
@@ -57,9 +64,9 @@ class UserViewModel @Inject constructor(
                     _state.value = UserState(isLoading = true)
                 }
             }
-        }.launchIn(viewModelScope)}
+        }.launchIn(viewModelScope)
     }
-
+    //para guardar en preferences
     fun saveAll(nombre: String,correo: String,contraseña: String){
         viewModelScope.launch {
             settingsDataStore.saveAll(nombre,correo,contraseña)
