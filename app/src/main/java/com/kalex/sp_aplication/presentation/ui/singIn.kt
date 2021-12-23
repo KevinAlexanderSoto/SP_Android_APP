@@ -82,9 +82,6 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
         { password.value = it
         }
 
-        /*savedStateHandle.set("idUsuario",text)
-        savedStateHandle.set("clave",password)*/
-
         viewModel.getUser(text,password)
         //var resp = viewModel.state.value
         Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )

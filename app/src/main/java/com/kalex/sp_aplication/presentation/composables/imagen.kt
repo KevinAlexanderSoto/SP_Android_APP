@@ -11,7 +11,7 @@ import coil.compose.rememberImagePainter
 import com.kalex.sp_aplication.R
 
 @Composable
-fun Imagen(url:Any,modifier: Modifier) {
+fun Imagen(url:Any?,modifier: Modifier) {
     Image(
         painter = rememberImagePainter(
             data = url,

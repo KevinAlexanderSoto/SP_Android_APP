@@ -1,6 +1,10 @@
 package com.kalex.sp_aplication.presentation.ui
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
+import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.layout.*
@@ -19,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -27,7 +30,6 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.camara.CameraCapture
@@ -41,6 +43,7 @@ import com.kalex.sp_aplication.presentation.validations.getFileSizeFloat
 import com.kalex.sp_aplication.presentation.validations.validarString
 import com.kalex.sp_aplication.presentation.viewModels.OficesViewModel
 import com.kalex.sp_aplication.presentation.viewModels.PostDocumentViewModel
+import com.kalex.usodecamara.galeria.GallerySelect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,7 +52,13 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import java.io.File
+import com.kalex.sp_aplication.common.getCapturedImage
+import java.io.ByteArrayOutputStream
+import android.util.Base64
+import com.kalex.sp_aplication.common.getGaleryImage
+import java.io.IOException
+import java.io.InputStream
+import kotlin.collections.ArrayList
 
 
 @ExperimentalPermissionsApi
@@ -68,12 +77,8 @@ fun EnviarDocumento(
     )
     val scope = rememberCoroutineScope()
 
-    //postDocumentViewModel.postDocument(requestBody)
-
     val sendDoc = postDocumentViewModel.state
     println("repsuesta del PUT  $sendDoc")
-
-
 
     //barra de cargando
     if (resp.isLoading){
@@ -104,7 +109,6 @@ fun EnviarDocumento(
         )
 
     }
-
 }
 @ExperimentalPermissionsApi
 @Composable
@@ -175,19 +179,20 @@ fun FormularioDoc(
 
         Spacer(Modifier.size(4.dp))
 
-        var menu1= dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
+        val menu1= dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
 
-        var text1 :String = InputText(label = "Numero de documento")
-        var text2 = InputText(label = "Nombre")
-        var text3 = InputText(label = "Apellido")
-        var text4 = InputText(label = "Correo",correo)
+        val text1 :String = InputText(label = "Numero de documento")
+        val text2 = InputText(label = "Nombre")
+        val text3 = InputText(label = "Apellido")
+        val text4 = InputText(label = "Correo",correo)
 
-        var menu2=dropDownMenu(ciudades, nombreInput = "Ciudad")
-        var menu3=dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
+        val menu2=dropDownMenu(ciudades, nombreInput = "Ciudad")
+        val menu3=dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
 
        //------------------------------------Para la foto---------------------------------
-        var tomarFoto:Boolean =  false
-
+        var tomarFoto =  false
+        var cargarFoto =  false
+        val context = LocalContext.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement=Arrangement.Center,
@@ -195,47 +200,79 @@ fun FormularioDoc(
                     .fillMaxWidth(0.9f)
                     .padding(4.dp)
             ){
-                BtncargarImg("Cargar img"){
+            cargarFoto= BtncargarImg("Cargar img")
 
-                }
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                var click = false
-                 tomarFoto= BtncargarImg("Tomar foto"){
-                    click = !click
-                }
+
+                 tomarFoto= BtncargarImg("Tomar foto")
 
             }
 
         var UriImg :Uri = Uri.parse("file://dev/null")
-        if(tomarFoto){
-            capturaraImg(modifier = Modifier,
-                onimagenTomada = {it->
-                    println("El tamaño de la foto es :"+ it.toFile().getFileSizeFloat())
 
-                } )
+        //inicializar variable Bitmap
+        var imgBitmap :Bitmap? = assetsToBitmap("ic_launcher_background",context)
 
 
+        println("Presiono botton foto : "+tomarFoto)
+        println("Presiono botton galeria : "+cargarFoto)
+
+//----------------------Obtener foto desde La CAMARA---------------------------
+        if(tomarFoto && !cargarFoto){
+            UriImg = capturaraImg(
+                modifier = Modifier,
+            )
+            if(UriImg != EMPTY_IMAGE_URI ) {
+                imgBitmap = getCapturedImage(UriImg)
+                //println("El tamaño de la foto de galeria es :" + UriImg.toFile().getFileSizeFloat())
+              /*
+                if (imgBitmap != null) {
+                    println("Cantidad de bytes Camara: " + imgBitmap!!.getByteCount())
+
+                }*/
+            }
         }
-        val uriSize = UriImg.toFile().getFileSizeFloat()
-        println("El tamaño de la variable Uri es : $uriSize")
+//----------------------Obtener foto desde Galeria---------------------------
+        if (cargarFoto){
+            UriImg = capturaraImgGaleria(
+                modifier = Modifier,
+            )
+
+            if(UriImg != EMPTY_IMAGE_URI ) {
+                imgBitmap = getGaleryImage(UriImg, context)
+
+            }
+        }
+
+
+
 
 //-------------------validaciones para habilitar enviar data---------------------------
-        var validacion :Boolean = validarString(text1)&&validarString(text2)&&validarString(text3) &&validarString(text4)&&validarString(menu1)&&validarString(menu2)&&validarString(menu3)
+        var validacion :Boolean = false
+        if (imgBitmap != null){
+           validacion = validarString(text1)&&validarString(text2)&&validarString(text3) &&validarString(text4)&&validarString(menu1)&&validarString(menu2)&&validarString(menu3)
 
+        }
+
+//-------------------Armado del body para Post Document---------------------------
         //Crear Body para mandar
         var requestBody : RequestBody? =null
 
         if(validacion){
+//-------------------Convertir Base 64---------------------------
+            val imgBse64 = imgBitmap?.toBase64String()
+            val imgBase64Encabezado = "data:image/jpeg;base64,"+ imgBse64
+
             // Create JSON using JSONObject
-            var jsonObject = JSONObject()
-            jsonObject.put("TipoId", "CC")
-            jsonObject.put("Identificacion", "3540")
-            jsonObject.put("Nombre", "kevin")
-            jsonObject.put("Apellido", "Soto")
-            jsonObject.put("Ciudad", "Medellín")
-            jsonObject.put("Correo", "kevinalexandersoto999@gmail.com")
-            jsonObject.put("TipoAdjunto", "Certificado de cuenta")
-            jsonObject.put("Adjunto", "")
+            val jsonObject = JSONObject()
+            jsonObject.put("TipoId", menu1)
+            jsonObject.put("Identificacion", text1)
+            jsonObject.put("Nombre", text2)
+            jsonObject.put("Apellido", text3)
+            jsonObject.put("Ciudad", menu2)
+            jsonObject.put("Correo", text4)
+            jsonObject.put("TipoAdjunto", menu3)
+            jsonObject.put("Adjunto", imgBase64Encabezado)
 
             var jsonObjectString = jsonObject.toString()
 
@@ -244,6 +281,28 @@ fun FormularioDoc(
 
         BtnEnviarImg(validacion,postDocumentViewModel,requestBody)
 
+    }
+
+}
+
+//Convertir a Bitmap desde el file name NO SE USA , PERO ES INTEREZANTE
+fun assetsToBitmap(fileName:String,context : Context): Bitmap?{
+
+    return try{
+        val stream : InputStream  = context.assets.open(fileName)
+        BitmapFactory.decodeStream(stream)
+    }catch (e: IOException){
+        e.printStackTrace()
+        null
+    }
+}
+
+
+// extension function to encode bitmap to base64 string
+fun Bitmap.toBase64String():String{
+    ByteArrayOutputStream().apply {
+        compress(Bitmap.CompressFormat.JPEG,90,this)
+        return Base64.encodeToString(toByteArray(),Base64.DEFAULT)
     }
 }
 
@@ -334,7 +393,6 @@ fun BtnEnviarImg(
     postDocumentViewModel: PostDocumentViewModel,
     requestBody: RequestBody?
 ) {
-    val context = LocalContext.current
     Button(
         onClick = {
             requireNotNull(requestBody)
@@ -372,9 +430,7 @@ fun BtnEnviarImg(
 @Composable
 fun BtncargarImg(
     texto: String,
-     dede : () -> Unit
 ):Boolean{
-    val context = LocalContext.current
 
     var click by remember { mutableStateOf(false) }
     Button(
@@ -403,30 +459,34 @@ fun BtncargarImg(
     return click
 }
 
+//funcion para capturar img y validar su tamaño
 @ExperimentalPermissionsApi
 @Composable
-fun capturaraImg(modifier: Modifier = Modifier,onimagenTomada: (Uri) -> Unit = { }) {
-    var emptyImageUri = Uri.parse("file://dev/null")
-    var imageUri by remember { mutableStateOf(emptyImageUri) }
-
-    if (imageUri != emptyImageUri) {
+fun capturaraImg(
+    modifier: Modifier = Modifier,
+    onimagenTomada: (Uri) -> Unit = { }
+):Uri {
+    var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
+    val context = LocalContext.current
+    if (imageUri != EMPTY_IMAGE_URI) {
         onimagenTomada(imageUri)
-        Column (
+        Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-                ){
+        ) {
 
             Imagen(
                 imageUri, modifier = Modifier
                     .height(400.dp)
                     .width(500.dp)
-                    .padding(10.dp) )
+                    .padding(10.dp)
+            )
 
             Button(
                 modifier = Modifier,
                 onClick = {
-                    imageUri = emptyImageUri
+                    imageUri = EMPTY_IMAGE_URI
                 }
             ) {
                 Text("Eliminar imagen")
@@ -435,11 +495,73 @@ fun capturaraImg(modifier: Modifier = Modifier,onimagenTomada: (Uri) -> Unit = {
 
 
     } else {
-        CameraCapture(
+
+            CameraCapture(
+                modifier = modifier,
+                onImageFile = { file ->
+                    imageUri = file.toUri()
+                    //-------------------validaciones para tamaño de imagenes---------------------------
+                    val uriSize = imageUri.toFile().getFileSizeFloat()
+                    if (uriSize > 1000) {
+                        Toast.makeText(
+                            context,
+                            "Imagen demaciado pesada,toma otra foto",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        imageUri = EMPTY_IMAGE_URI
+                    }
+                }
+            )
+    }
+    return imageUri
+}
+
+//funcion para capturar img y validar su tamaño
+@ExperimentalPermissionsApi
+@Composable
+fun capturaraImgGaleria(
+    modifier: Modifier = Modifier,
+    onimagenTomada: (Uri) -> Unit = { }
+):Uri {
+    var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
+
+    if (imageUri != EMPTY_IMAGE_URI) {
+        onimagenTomada(imageUri)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Imagen(
+                imageUri, modifier = Modifier
+                    .height(400.dp)
+                    .width(500.dp)
+                    .padding(10.dp)
+            )
+
+            Button(
+                modifier = Modifier,
+                onClick = {
+                    imageUri = EMPTY_IMAGE_URI
+                }
+            ) {
+                Text("Eliminar imagen")
+            }
+        }
+
+
+    } else {
+        GallerySelect(
             modifier = modifier,
-            onImageFile = { file ->
-                imageUri = file.toUri()
+            onImageUri = { uri ->
+                imageUri = uri
+                //-------------------validaciones para tamaño de imagenes---------------------------
             }
         )
     }
+    return imageUri
 }
+
+val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")
+
