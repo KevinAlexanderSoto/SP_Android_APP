@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.maps.model.LatLng
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
 import com.kalex.sp_aplication.domain.use_case.get_ofices.GetOficesUseCase

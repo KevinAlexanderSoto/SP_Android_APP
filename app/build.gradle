@@ -61,7 +61,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
     implementation 'androidx.activity:activity-compose:1.3.1'
     implementation 'androidx.test:core-ktx:1.4.0'
-    implementation 'com.google.android.gms:play-services-location:19.0.0'
+   implementation 'com.google.android.gms:play-services-location:19.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -70,11 +70,15 @@ dependencies {
 
     // to img
     implementation "io.coil-kt:coil-compose:1.4.0"
+    implementation "androidx.biometric:biometric:1.2.0-alpha03"
 
     //para google maps
-    implementation "com.google.android.gms:play-services-maps:18.0.1"
+    implementation "com.google.android.libraries.maps:maps:3.1.0-beta"
+    implementation "com.google.maps.android:maps-v3-ktx:2.2.0"
+    implementation "androidx.fragment:fragment-ktx:1.3.2"
+    /*implementation "com.google.android.gms:play-services-maps:18.0.1"
     implementation 'com.google.android.gms:play-services-base:18.0.1'
-    implementation 'com.google.android.gms:play-services-tasks:18.0.1'
+    implementation "com.google.maps.android:maps-v3-ktx:2.2.0"*/
 
     //para solicitar permisos
     def accoompanist_version = "0.18.0"
@@ -125,4 +129,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.2"
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
+}
+
+// Compiler flag to use experimental Compose APIs
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += [
+                "-Xopt-in=kotlin.RequiresOptIn"
+        ]
+    }
 }

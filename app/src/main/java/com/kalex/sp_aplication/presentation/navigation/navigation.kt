@@ -7,17 +7,19 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.ui.*
+import java.io.File
 
+/*TODO ESTO POR LA AUTENTICACION CON HUELLA :V , SE QUEDA ASI HASTA QUE SEPARA COMO MEJORARLO
 @ExperimentalPermissionsApi
 @Composable
-fun Navegacion() {
+fun Navegacion(onfiger: () -> Unit) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Constants.MainNavItem)
     {
         composable(Constants.MainNavItem){
-            SingIn(navController)
+            SingIn(navController){onfiger()}
         }
         composable(Constants.HomeNavItem
         ){
@@ -43,4 +45,4 @@ fun Navegacion() {
             VerOficinas(navController)
         }
     }
-}
+}*/

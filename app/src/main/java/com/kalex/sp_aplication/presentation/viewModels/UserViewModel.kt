@@ -27,16 +27,14 @@ class UserViewModel @Inject constructor(
 
     private val _state = mutableStateOf(UserState())
     val state: State<UserState> = _state
-    val savedStateHandle = savedStateHandle
+    var correo : String =""
+    var clave : String = ""
     init {
 
-        /*var iduser:String=""
-        savedStateHandle.get<String>("idUsuario")?.let { Id ->
-            iduser = Id
-        }
-        savedStateHandle.get<String>("clave")?.let { clave ->
-            //getUser(iduser,clave)
-        }*/
+         settingsDataStore.settingsPrefsFlow.onEach { result ->
+            correo = result.correo
+             clave = result.contraseña
+        }.launchIn(viewModelScope)
 
     }
     //Emailvalidation   MutableState<String>
@@ -66,6 +64,34 @@ class UserViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+
+    fun getUserHuella() {
+
+    println("HIZO LA CONSULTA")
+    println("CorreoGuardado: $correo")
+
+    getUserUseCase(correo, clave).onEach { result ->
+        when (result) {
+            is Resource.Success -> {
+
+                _state.value = UserState(user = result.data)
+            }
+            is Resource.Error -> {
+                _state.value = UserState(
+                    error = result.message ?: "An unexpected error occured"
+                )
+            }
+            is Resource.Loading -> {
+                _state.value = UserState(isLoading = true)
+            }
+        }
+    }.launchIn(viewModelScope)
+
+    }
+
+
+
     //para guardar en preferences
     fun saveAll(nombre: String,correo: String,contraseña: String){
         viewModelScope.launch {

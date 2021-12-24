@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -33,16 +34,17 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.maps.CameraUpdateFactory
+import com.google.android.libraries.maps.MapView
 import com.kalex.sp_aplication.presentation.composables.Drawer
 import kotlinx.coroutines.CoroutineScope
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.MarkerOptions
+import com.google.maps.android.ktx.awaitMap
 import com.kalex.sp_aplication.camara.Permission
 import com.kalex.sp_aplication.domain.model.ItemOfice
 import com.kalex.sp_aplication.presentation.viewModels.OficesViewModel
+import kotlinx.coroutines.Dispatchers
 
 
 import kotlinx.coroutines.launch
@@ -103,7 +105,7 @@ private  fun getDeviceLocation(context: Context, viewModel: OficesViewModel) {
 
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     {
-        println("Accedio a getDeviceLocation")
+
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
         try {
@@ -220,7 +222,7 @@ fun ToolBarOfice(
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-            MyMap(coordenadas,viewModel.userLocation) {}
+            MyMap(coordenadas,viewModel.userLocation)
 
         }
 
@@ -229,48 +231,68 @@ fun ToolBarOfice(
 
 @Composable
 fun MyMap(coordenadas: ArrayList<ItemOfice>,
-          userLocation : LatLng,
-          onReady:(GoogleMap)-> Unit) {
-    val context = LocalContext.current
-    val mapView = remember{MapView(context)}
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    lifecycle.addObserver(rememberMapLifeCycle(map = mapView))
-println("userLocation  : "  + userLocation)
+          userLocation : LatLng = LatLng(6.217,-75.567),
+         ) {
+    val mapView = rememberMapViewWithLifeCycle()
+//println("userLocation  : "  + userLocation)
     AndroidView(
-        factory = {
-            mapView.apply {
-                mapView.getMapAsync{googleMap ->
-                    val zoomLevel = 12f
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        LatLng(userLocation.latitude, userLocation.longitude),
-                        zoomLevel))
+        {mapView}
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val map = mapView.awaitMap()
+            map.uiSettings.isZoomControlsEnabled = true
 
+            val zoomLevel = 12f
+            map.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                userLocation,
+                zoomLevel))
 
-                    for (coordenada in coordenadas) {
-                        googleMap.addMarker(MarkerOptions()
-                            .position(LatLng(coordenada.Latitud.toDouble(),coordenada.Longitud.toDouble()))
-                            .title(coordenada.Nombre)
-                            .snippet(coordenada.Ciudad))
-                    }
-
-                }
-            }
-        })
-}
-
-@Composable
-fun rememberMapLifeCycle(map: MapView): LifecycleObserver {
-    return remember {
-        LifecycleEventObserver{source, event ->
-            when(event){
-                Lifecycle.Event.ON_CREATE -> map.onCreate(Bundle())
-                Lifecycle.Event.ON_START -> map.onStart()
-                Lifecycle.Event.ON_RESUME -> map.onResume()
-                Lifecycle.Event.ON_PAUSE -> map.onPause()
-                Lifecycle.Event.ON_STOP -> map.onStop()
-                Lifecycle.Event.ON_DESTROY -> map.onDestroy()
-                Lifecycle.Event.ON_ANY -> throw IllegalStateException()
+            for (coordenada in coordenadas) {
+                map.addMarker(
+                    MarkerOptions()
+                    .position(LatLng(coordenada.Latitud.toDouble(),coordenada.Longitud.toDouble()))
+                    .title(coordenada.Nombre)
+                    .snippet(coordenada.Ciudad))
             }
         }
     }
 }
+
+
+
+@Composable
+fun rememberMapViewWithLifeCycle(): MapView {
+    val context = LocalContext.current
+    val mapView = remember {
+        MapView(context).apply {
+            id = com.google.maps.android.ktx.R.id.map_frame
+        }
+    }
+    val lifeCycleObserver = rememberMapLifecycleObserver(mapView)
+    val lifeCycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifeCycle) {
+        lifeCycle.addObserver(lifeCycleObserver)
+        onDispose {
+            lifeCycle.removeObserver(lifeCycleObserver)
+        }
+    }
+
+    return mapView
+}
+
+@Composable
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
+    remember(mapView) {
+        LifecycleEventObserver { _, event ->
+            when(event) {
+                Lifecycle.Event.ON_CREATE -> mapView.onCreate(Bundle())
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                else -> throw IllegalStateException()
+            }
+        }
+    }

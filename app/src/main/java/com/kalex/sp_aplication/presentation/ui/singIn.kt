@@ -1,6 +1,6 @@
 package com.kalex.sp_aplication.presentation.ui
 
-import android.widget.Toast
+/*import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -37,12 +37,14 @@ import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File*/
 
 
+/*
 @Composable fun SingIn(
     navController: NavController,
     viewModel : UserViewModel = hiltViewModel(),
-
+    onfiger: () -> Unit
 ){
 
     Column(
@@ -89,7 +91,9 @@ import kotlinx.coroutines.runBlocking
         //var resp = viewModel.state.value
         Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
 
-        ButtonHuella(text.valid())//,onfinger
+        ButtonHuella(text.valid()){
+            onfiger()
+        }//,onfinger
     }
 
 
@@ -246,9 +250,9 @@ fun Buttonin(
 
 
 @Composable
-fun ButtonHuella(habilitado: Boolean,) {//,
+fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
     OutlinedButton(
-        onClick = {  },
+        onClick = { onfiger() },
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth(0.8f),
@@ -260,7 +264,5 @@ fun ButtonHuella(habilitado: Boolean,) {//,
         Icono(R.drawable.baseline_fingerprint_24,35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText("Ingresar con huella",22)
-
-
     }
-}
+}*/
