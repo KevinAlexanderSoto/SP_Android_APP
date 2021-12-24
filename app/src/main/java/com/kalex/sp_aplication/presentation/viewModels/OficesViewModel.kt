@@ -23,7 +23,9 @@ class OficesViewModel @Inject constructor(
     private val _state = mutableStateOf(OficeState())
     val state: State<OficeState> = _state
     var correo :String = ""
+
     var userLocation : LatLng = LatLng(6.217,-75.567)
+
     init {
         val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
             correo = result.correo

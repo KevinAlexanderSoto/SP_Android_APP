@@ -92,7 +92,6 @@ fun VerOficinas(navController: NavHostController,
             }
         },
     ) {
-        val context = LocalContext.current
 
         getDeviceLocation(context,viewModel)
         GetOficinas(viewModel,navController)
@@ -122,7 +121,7 @@ private  fun getDeviceLocation(context: Context, viewModel: OficesViewModel) {
                             lastKnownLocation.altitude,
                             lastKnownLocation.longitude
                         )
-                        println("ultima locacion del user : " + location)
+                        println("UserLocation : $location")
                        viewModel.userLocation = location
 
                     }
@@ -166,7 +165,7 @@ fun GetOficinas(viewModel: OficesViewModel, navController: NavHostController) {
         }
     }
     if (!resp.isLoading){
-
+        //coordenadas de cada oficina
         val coordenadas = ArrayList<ItemOfice>()
         for (coordenada in resp.ofices?.Items!!) {
                 coordenadas.add(coordenada)
@@ -233,20 +232,26 @@ fun ToolBarOfice(
 fun MyMap(coordenadas: ArrayList<ItemOfice>,
           userLocation : LatLng = LatLng(6.217,-75.567),
          ) {
+
+
     val mapView = rememberMapViewWithLifeCycle()
-//println("userLocation  : "  + userLocation)
+
     AndroidView(
         {mapView}
     ) {
         CoroutineScope(Dispatchers.Main).launch {
             val map = mapView.awaitMap()
             map.uiSettings.isZoomControlsEnabled = true
+            Log.d("locacion","UserLocation : $userLocation")
+            val medellin = LatLng(6.217,-75.567)
+            Log.d("locacion","$medellin")
 
-            val zoomLevel = 12f
+
+           val zoomLevel = 12f
             map.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                userLocation,
-                zoomLevel))
+                    userLocation,
+                    zoomLevel))
 
             for (coordenada in coordenadas) {
                 map.addMarker(

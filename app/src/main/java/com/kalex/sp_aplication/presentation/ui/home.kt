@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
@@ -14,11 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorLong
 import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.composables.*
 import com.kalex.sp_aplication.presentation.theme.blanco
+import com.kalex.sp_aplication.presentation.theme.color1
+import com.kalex.sp_aplication.presentation.theme.color2
+import com.kalex.sp_aplication.presentation.theme.color3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -77,7 +82,7 @@ fun Contenido(
         verticalArrangement = Arrangement.spacedBy(19.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
 
-        Imagen(url = R.drawable.homeimg, modifier = Modifier
+        Imagen(url = R.drawable.people2, modifier = Modifier
             .wrapContentSize(Alignment.BottomCenter)
             .height(246.dp)
             .width(440.dp)
@@ -87,21 +92,22 @@ fun Contenido(
             R.drawable.upload_file_24,
             navController,
             Constants.SendDocNavItem,
-            Color.Cyan
+            color1
+
         )
         Card(
             encabezado = "Ver Documentos",
             R.drawable.plagiarism_24,
             navController,
             Constants.getDocNavItem,
-            Color.Magenta
+            color2
         )
         Card(
             encabezado = "Oficinas",
             R.drawable.location_on_24,
             navController,
             Constants.oficesNavItem,
-            Color.Yellow
+            color3
         )
         Spacer(modifier = Modifier.padding(3.dp))
     }

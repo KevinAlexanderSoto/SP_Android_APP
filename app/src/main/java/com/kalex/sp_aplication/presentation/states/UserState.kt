@@ -5,7 +5,7 @@ import com.kalex.sp_aplication.domain.model.User
 
 data class UserState(
     val isLoading:Boolean = false,
-    val user : Userdto?=null,
+    var user : Userdto?=null,
     val error :String = ""
 
 )

@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ActivityScenario.launch
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
@@ -53,12 +54,11 @@ import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
 import com.kalex.sp_aplication.presentation.ui.*
 import com.kalex.sp_aplication.presentation.validations.Emailvalidation
+import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
 import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity () {
@@ -67,10 +67,10 @@ class MainActivity : ComponentActivity () {
     @ExperimentalPermissionsApi
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState,
-            )
+        super.onCreate(savedInstanceState,)
+
         setContent {
-             viewModel  = hiltViewModel()
+            viewModel  = hiltViewModel()
             SPAplicationTheme {
                 val navController = rememberNavController()
                 NavHost(
@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity () {
                 super.onAuthenticationSucceeded(result)
                         viewModel.getUserHuella()
 
-                Toast.makeText(this@MainActivity, "Coloca Tu Huella otra vez", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Huella correcta", Toast.LENGTH_SHORT).show()
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity () {
 
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun launchBiometric():Boolean {
+    private fun launchBiometric() {
         if (checkBiometricSupport()) {
             val biometricPrompt = BiometricPrompt.Builder(this)
                 .apply {
@@ -163,14 +163,13 @@ class MainActivity : ComponentActivity () {
                     setDescription(getString(R.string.prompt_info_description))
                     setConfirmationRequired(false)
                     setNegativeButton(getString(R.string.prompt_info_use_app_password), mainExecutor, { _, _, ->
-                       Toast.makeText(this@MainActivity, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
                     })
                 }.build()
-
             biometricPrompt.authenticate(getCancellationSignal(), mainExecutor, authenticationCallback)
-            return true
+
         }
-        return false
+
     }
 
 
@@ -190,7 +189,8 @@ class MainActivity : ComponentActivity () {
 fun SingIn(
     navController: NavController,
     viewModel : UserViewModel ,
-    onfiger: () -> Boolean
+    onfiger: () -> Unit,
+    dataviewmodel : DataViewModel = hiltViewModel()
 ){
 
     Column(
@@ -233,18 +233,26 @@ fun SingIn(
         { password.value = it
         }
 
-        viewModel.getUser(text.correo,password.value)
         //var resp = viewModel.state.value
         Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
 
         //BOTTON PARA LA HUELLA
         OutlinedButton(
             onClick = {
-                        onfiger()
+                onfiger()
 
-                println("Ejecuto esto")
-                var resp = viewModel.state.value
-                //println("Respuesta de server: $resp")
+                      },
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth(0.8f),
+            border = BorderStroke(1.dp, Color.Black),
+            contentPadding = PaddingValues(12.dp),
+            shape = RoundedCornerShape(23.dp),
+            //enabled = habilitado
+        ) {
+            var resp = viewModel.state.value
+
+            if(resp.user != null){
                 resp.user?.let {user ->
                     val acceso = user.acceso
                     println("acceso $acceso")
@@ -257,16 +265,9 @@ fun SingIn(
                         //Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
 
                     }
-                      }
-                      },
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth(0.8f),
-            border = BorderStroke(1.dp, Color.Black),
-            contentPadding = PaddingValues(12.dp),
-            shape = RoundedCornerShape(23.dp),
-            //enabled = habilitado
-        ) {
+                }
+            }
+
             Icono(R.drawable.baseline_fingerprint_24,35)
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             ButtonText("Ingresar con huella",22)
@@ -378,13 +379,24 @@ fun Buttonin(
     val context = LocalContext.current
     Button(
         onClick = {
-            runBlocking {
-                launch {
-                    delay(100L)
-                }
-            }
+            viewModel.getUser(correo,contraseña)
 
-            var resp = viewModel.state.value
+        },
+        modifier = Modifier
+            .padding(top = 30.dp)
+            .fillMaxWidth(0.8f)
+        ,
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RoundedCornerShape(23.dp),
+        contentPadding = PaddingValues(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = spcolor,
+            contentColor = blanco
+        ),
+        enabled = habilitado
+    ) {
+        var resp = viewModel.state.value
+        if(resp.user!= null){
 
             //println("Respuesta de server: $resp")
             resp.user?.let {user ->
@@ -403,23 +415,9 @@ fun Buttonin(
                 }
 
             }
+            resp.user = null
+        }
 
-
-
-        },
-        modifier = Modifier
-            .padding(top = 30.dp)
-            .fillMaxWidth(0.8f)
-        ,
-        border = BorderStroke(1.dp, Color.Black),
-        shape = RoundedCornerShape(23.dp),
-        contentPadding = PaddingValues(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = spcolor,
-            contentColor = blanco
-        ),
-        enabled = habilitado
-    ) {
 
         Icono(R.drawable.outline_login_24,30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))

@@ -3,6 +3,7 @@ package com.kalex.sp_aplication.presentation.viewModels
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
 import com.kalex.sp_aplication.domain.use_case.get_users.GetUserUseCase
 import com.kalex.sp_aplication.presentation.states.UserState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -27,13 +29,14 @@ class UserViewModel @Inject constructor(
 
     private val _state = mutableStateOf(UserState())
     val state: State<UserState> = _state
-    var correo : String =""
+    var correo : String ="123"
     var clave : String = ""
+    var nombre : String = ""
     init {
-
          settingsDataStore.settingsPrefsFlow.onEach { result ->
             correo = result.correo
              clave = result.contraseña
+             nombre = result.nombre
         }.launchIn(viewModelScope)
 
     }
@@ -46,7 +49,7 @@ class UserViewModel @Inject constructor(
         }else{
              realcontraseña = contraseña
         }
-
+        println("ESTA EN GET DEL FORMULARIO")
         getUserUseCase(email,realcontraseña).onEach { result ->
             when (result) {
                 is Resource.Success -> {
@@ -68,9 +71,6 @@ class UserViewModel @Inject constructor(
 
     fun getUserHuella() {
 
-    println("HIZO LA CONSULTA")
-    println("CorreoGuardado: $correo")
-
     getUserUseCase(correo, clave).onEach { result ->
         when (result) {
             is Resource.Success -> {
@@ -87,7 +87,9 @@ class UserViewModel @Inject constructor(
             }
         }
     }.launchIn(viewModelScope)
-
+        viewModelScope.launch {
+            settingsDataStore.saveAll(nombre, correo, clave)
+        }
     }
 
 

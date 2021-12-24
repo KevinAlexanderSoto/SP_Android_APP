@@ -55,6 +55,9 @@ import org.json.JSONObject
 import com.kalex.sp_aplication.common.getCapturedImage
 import java.io.ByteArrayOutputStream
 import android.util.Base64
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import com.kalex.sp_aplication.common.getGaleryImage
 import java.io.IOException
 import java.io.InputStream
@@ -173,14 +176,27 @@ fun FormularioDoc(
         //------------------------------------Formulario---------------------------------
         val listaDocumento = listOf("CC", "TI", "CE", "PA")
         val listaTipoAdjunto = listOf("Certificado de cuenta", "Cédula", "Factura", "Incapacidad")
-
+        // manejar focus de los texto,
+        val localFocusManager = LocalFocusManager.current
         Spacer(Modifier.size(4.dp))
 
         val menu1= dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
-        val text1 :String = InputText(label = "Numero de documento")
-        val text2 = InputText(label = "Nombre")
-        val text3 = InputText(label = "Apellido")
-        val text4 = InputText(label = "Correo",correo)
+        val text1 :String = InputText(label = "Numero de documento",onAction = {
+            // bajar al siguiente field
+            localFocusManager.moveFocus(FocusDirection.Down)
+        })
+        val text2 = InputText(label = "Nombre",onAction = {
+            // bajar al siguiente field
+            localFocusManager.moveFocus(FocusDirection.Down)
+        })
+        val text3 = InputText(label = "Apellido",onAction = {
+            // bajar al siguiente field
+            localFocusManager.moveFocus(FocusDirection.Down)
+        })
+        val text4 = InputText(label = "Correo",correo,onAction = {
+            // bajar al siguiente field
+            localFocusManager.moveFocus(FocusDirection.Down)
+        })
         val menu2=dropDownMenu(ciudades, nombreInput = "Ciudad")
         val menu3=dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
 
@@ -219,12 +235,7 @@ fun FormularioDoc(
             )
             if(UriImg != EMPTY_IMAGE_URI ) {
                 imgBitmap = getCapturedImage(UriImg)
-                //println("El tamaño de la foto de galeria es :" + UriImg.toFile().getFileSizeFloat())
-              /*
-                if (imgBitmap != null) {
-                    println("Cantidad de bytes Camara: " + imgBitmap!!.getByteCount())
 
-                }*/
             }
         }
 //----------------------Obtener foto desde Galeria---------------------------
@@ -304,7 +315,8 @@ fun Bitmap.toBase64String():String{
 @Composable
 fun InputText(
 label : String,
-initialValue :String=""
+initialValue :String="",
+onAction: () -> Unit
 ):String{
     var text by remember { mutableStateOf(initialValue ) }
     TextField(
@@ -318,6 +330,9 @@ initialValue :String=""
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done
         ),
+        keyboardActions = KeyboardActions (onDone = {
+            onAction()
+        }),
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent
         )
@@ -388,6 +403,7 @@ fun BtnEnviarImg(
     postDocumentViewModel: PostDocumentViewModel,
     requestBody: RequestBody?
 ) {
+    val context = LocalContext.current
     Button(
         onClick = {
             requireNotNull(requestBody)
@@ -396,8 +412,7 @@ fun BtnEnviarImg(
             runBlocking {
                 delay(100)
             }
-            var resp = postDocumentViewModel.state
-            println(resp.value)
+
 
         },
         modifier = Modifier
@@ -413,6 +428,13 @@ fun BtnEnviarImg(
         ),
         enabled = validacion
     ) {
+        var resp = postDocumentViewModel.state
+        resp.value.respuesta
+        println(resp.value)
+        if(resp.value.respuesta != null){
+            Toast.makeText(context,"Documento Enviado Exitosamente",Toast.LENGTH_LONG).show()
+            println(resp.value)
+        }
 
         Icono(R.drawable.send_24,25)
         Spacer(Modifier.size(4.dp))

@@ -27,19 +27,20 @@ class DocumentViewModel @Inject constructor(
     val state: State<DocumentState> = _state
     var dato :String = ""
    init{
-       val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
+       settingsDataStore.settingsPrefsFlow.onEach { result ->
            dato = result.correo
        }.launchIn(viewModelScope)
+       println("Correo Guardado :  $dato")
        /*println("keys guardadas"+savedStateHandle.keys())
        savedStateHandle.get<String>("correo")?.let {correo->
        }*/
        getDocuments(dato)
     }
 
-    private fun getDocuments(email: String) {
+    private fun getDocuments(email: String = "no") {
 
         getDocumentsUseCase(email).onEach { result ->
-            println("DENTRO DE FUNCION ")
+
             when (result) {
                 is Resource.Success -> {
                     _state.value = DocumentState(document = result.data)
