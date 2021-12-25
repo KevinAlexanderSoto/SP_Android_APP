@@ -23,6 +23,7 @@ import com.kalex.sp_aplication.data.remote.dto.ItemDocDto
 import com.kalex.sp_aplication.domain.model.Item
 import com.kalex.sp_aplication.presentation.composables.DocumentListItem
 import com.kalex.sp_aplication.presentation.composables.Drawer
+import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
 import com.kalex.sp_aplication.presentation.viewModels.DocumentViewModel
 import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -32,12 +33,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun VerDocumentos(navController: NavHostController,
 viewModel: DocumentViewModel = hiltViewModel(),
+    viewmodelData : DataViewModel = hiltViewModel()
 ) {
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     )
     val scope = rememberCoroutineScope()
     //get documentos
+
+   /* var correo = viewmodelData.correo
+    viewModel.getDocuments(correo)*/
+
     var resp = viewModel.state.value
     //barra de cargando
     if (resp.isLoading){

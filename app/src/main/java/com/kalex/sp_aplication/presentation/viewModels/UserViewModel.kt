@@ -32,6 +32,7 @@ class UserViewModel @Inject constructor(
     var correo : String ="123"
     var clave : String = ""
     var nombre : String = ""
+    var inicio : Boolean = false
     init {
          settingsDataStore.settingsPrefsFlow.onEach { result ->
             correo = result.correo

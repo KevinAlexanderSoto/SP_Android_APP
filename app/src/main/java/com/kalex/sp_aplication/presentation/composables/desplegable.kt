@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
+import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -30,10 +31,17 @@ fun Drawer(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     navController: NavController,
-    viewModel : DataViewModel = hiltViewModel()
+    viewModel : DataViewModel = hiltViewModel(),
+
 ) {
     //obtener nombre , para que se vuelva a pintar
     viewModel.settingsPrefs
+
+
+    print("correo dataviewmodel : " +viewModel.correo )
+    print("correo dataviewmodel : " +viewModel.constraseña )
+
+
     var nombre = viewModel.nombre
 
     Column {

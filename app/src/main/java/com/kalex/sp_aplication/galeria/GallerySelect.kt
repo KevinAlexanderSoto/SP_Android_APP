@@ -54,8 +54,8 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         rationale = "Si quieres seleccionar una foto , debo acceder a la galeria",
         permissionNotAvailableContent = {
             Column(modifier) {
-                Text("O noes! No Photo Gallery!")
-                Spacer(modifier = Modifier.height(8.dp))
+                Text("O noes! No puedo acceder a tu Galeria")
+                Spacer(modifier = Modifier.height(9.dp))
                 Row {
                     Button(
                         modifier = Modifier.padding(4.dp),
@@ -67,7 +67,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             )
                         }
                     ) {
-                        Text("Open Settings")
+                        Text("Abrir Configuración")
                     }
                     // If they don't want to grant permissions, this button will result in going back
                     Button(
@@ -76,7 +76,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             onImageUri(EMPTY_IMAGE_URI)
                         }
                     ) {
-                        Text("Use Camera")
+                        Text("Usar la camara")
                     }
                 }
             }

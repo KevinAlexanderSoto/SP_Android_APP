@@ -19,6 +19,7 @@ class DataViewModel @Inject constructor(
 var nombre :String = ""
 var correo :String = ""
 var constraseña :String = ""
+var inicio :Boolean = false
 
     val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
         nombre = result.nombre

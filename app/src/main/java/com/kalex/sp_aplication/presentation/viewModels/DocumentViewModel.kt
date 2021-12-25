@@ -37,7 +37,7 @@ class DocumentViewModel @Inject constructor(
        getDocuments(dato)
     }
 
-    private fun getDocuments(email: String = "no") {
+    fun getDocuments(email: String = "no") {
 
         getDocumentsUseCase(email).onEach { result ->
 

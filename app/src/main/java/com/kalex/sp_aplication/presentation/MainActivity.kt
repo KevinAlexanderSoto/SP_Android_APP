@@ -234,13 +234,12 @@ fun SingIn(
         }
 
         //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
+        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value ,dataviewmodel)
 
-        //BOTTON PARA LA HUELLA
+        //TODO BOTTON PARA LA HUELLA
         OutlinedButton(
             onClick = {
                 onfiger()
-
                       },
             modifier = Modifier
                 .padding(vertical = 10.dp)
@@ -250,24 +249,32 @@ fun SingIn(
             shape = RoundedCornerShape(23.dp),
             //enabled = habilitado
         ) {
-            var resp = viewModel.state.value
 
-            if(resp.user != null){
-                resp.user?.let {user ->
+        //---------------------------Validacion de credenciales Huella----------------------
+            val context = LocalContext.current
+            var resp = viewModel.state.value
+            println("respuesta server $resp")
+            println("respuesta ERROR ${resp.error}")
+            if(resp.error == "HTTP 400"){
+                Toast.makeText(context,"No hay credenciales , Inicie con Correo y Contraseña",Toast.LENGTH_LONG).show()
+            }
+            if(resp.user != null) {
+                resp.user?.let { user ->
                     val acceso = user.acceso
                     println("acceso $acceso")
                     // println("respuesta${resp.user}")
-                    if (acceso == true){
-
+                    if (acceso == true) {
+                        //dataviewmodel.saveAll(nombre =  viewModel.nombre, correo = viewModel.correo, contraseña =viewModel.clave )
                         navController.navigate("home/${resp.user?.nombre}")
 
-                    }else if(acceso == false){
+                    } else if (acceso == false) {
                         //Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
 
                     }
                 }
             }
 
+//--------------------Composables del Boton -----------------------------------------
             Icono(R.drawable.baseline_fingerprint_24,35)
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             ButtonText("Ingresar con huella",22)
@@ -367,20 +374,22 @@ fun PasswordFiels(
 
         )
 }
-
+var contToast =0
 @Composable
 fun Buttonin(
     habilitado: Boolean,
     viewModel: UserViewModel,
     navController: NavController,
     correo: String,
-    contraseña :String
+    contraseña :String,
+    dataviewmodel : DataViewModel
 ) {
     val context = LocalContext.current
+
     Button(
         onClick = {
             viewModel.getUser(correo,contraseña)
-
+            contToast = 0
         },
         modifier = Modifier
             .padding(top = 30.dp)
@@ -396,26 +405,44 @@ fun Buttonin(
         enabled = habilitado
     ) {
         var resp = viewModel.state.value
-        if(resp.user!= null){
+            if (resp.user != null) {
 
-            //println("Respuesta de server: $resp")
-            resp.user?.let {user ->
-                val acceso = user.acceso
-                println("acceso $acceso")
-                // println("respuesta${resp.user}")
-                if (acceso == true){
+                //println("Respuesta de server: $resp")
+                resp.user?.let { user ->
+                    val acceso = user.acceso
+                    println("acceso $acceso")
+                    // println("respuesta${resp.user}")
+                    if (acceso == true) {
 
-                    Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
-                    viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
-                    navController.navigate("home/${resp.user?.nombre}")
+                        Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
+                        viewModel.saveAll(
+                            nombre = user.nombre,
+                            correo = correo,
+                            contraseña = contraseña
+                        )
+                        /*dataviewmodel.saveAll(
+                            nombre = user.nombre,
+                            correo = correo,
+                            contraseña = contraseña
+                        )*/
+                        navController.navigate("home/${resp.user?.nombre}")
+                        resp.user = null
+                    } else if (acceso == false) {
 
-                }else if(acceso == false){
-                    Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
+                        if(contToast < 1){
+                            Toast.makeText(
+                                context,
+                                "El Correo o la Contraseña son incorrectos",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            contToast++
+                        }
+
+
+                    }
 
                 }
 
-            }
-            resp.user = null
         }
 
 
