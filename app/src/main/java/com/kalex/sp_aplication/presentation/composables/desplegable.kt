@@ -37,11 +37,6 @@ fun Drawer(
     //obtener nombre , para que se vuelva a pintar
     viewModel.settingsPrefs
 
-
-    print("correo dataviewmodel : " +viewModel.correo )
-    print("correo dataviewmodel : " +viewModel.constraseña )
-
-
     var nombre = viewModel.nombre
 
     Column {

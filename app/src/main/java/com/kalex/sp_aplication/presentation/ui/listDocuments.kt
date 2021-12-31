@@ -60,7 +60,7 @@ viewModel: DocumentViewModel = hiltViewModel(),
 
     if (!resp.isLoading) {
         var docs = resp.document?.Items
-
+        println("Respuesta server : $docs")
         ToolBarVerDocs(navController,docs,scope,scaffoldState)
 
     }

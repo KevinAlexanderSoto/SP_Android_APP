@@ -2,8 +2,6 @@ package com.kalex.sp_aplication.domain.use_case.get_users
 
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.data.remote.dto.Userdto
-import com.kalex.sp_aplication.data.remote.dto.toUser
-import com.kalex.sp_aplication.domain.model.User
 import com.kalex.sp_aplication.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,7 +12,7 @@ import javax.inject.Inject
 class GetUserUseCase @Inject constructor(
     private val repository: UserRepository // injectamos la interface
 ){
-    operator fun invoke(idUsuario:String,clave :String) : Flow<Resource<Userdto>> = flow{
+    operator fun invoke(idUsuario: String, clave: String) : Flow<Resource<Userdto>> = flow{
         try {
             emit(Resource.Loading<Userdto>())
             val user = repository.getUser(idUsuario,clave)

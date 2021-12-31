@@ -1,6 +1,8 @@
 package com.kalex.sp_aplication.data.dataStore
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.kalex.sp_aplication.SpApplication
@@ -56,6 +58,15 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
+    suspend fun saveLogin(correo: String,contraseña: String){
+        context.dataStore.edit { preferences ->
+            preferences[CORREO] = correo
+            preferences[CONTRASEÑA] = contraseña
+
+        }
+    }
+
+
     companion object {
         val NOMBRE = stringPreferencesKey("nombre")
         val CORREO = stringPreferencesKey("correo")
@@ -63,7 +74,7 @@ class SettingsDataStore @Inject constructor(
     }
 
     data class DataNeed (
-        val nombre :String,
+        val nombre : String,
         val correo : String,
         val contraseña : String
             )

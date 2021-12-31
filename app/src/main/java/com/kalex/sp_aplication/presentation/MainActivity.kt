@@ -63,6 +63,7 @@ import kotlinx.coroutines.*
 @AndroidEntryPoint
 class MainActivity : ComponentActivity () {
     lateinit var viewModel :UserViewModel
+    lateinit var viewModelData :DataViewModel
     private var cancellationSignal: CancellationSignal? = null
     @ExperimentalPermissionsApi
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -71,6 +72,8 @@ class MainActivity : ComponentActivity () {
 
         setContent {
             viewModel  = hiltViewModel()
+            viewModelData = hiltViewModel()
+            viewModelData.settingsPrefs
             SPAplicationTheme {
                 val navController = rememberNavController()
                 NavHost(
@@ -119,8 +122,11 @@ class MainActivity : ComponentActivity () {
         object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
                 super.onAuthenticationSucceeded(result)
-                        viewModel.getUserHuella()
+                var email = viewModelData.correo
+                var contraseña = viewModelData.constraseña
 
+                viewModel.getUser(email,contraseña)
+                viewModel.saveLogin(correo = email,contraseña = contraseña)
                 Toast.makeText(this@MainActivity, "Huella correcta", Toast.LENGTH_SHORT).show()
             }
 
@@ -234,7 +240,7 @@ fun SingIn(
         }
 
         //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value ,dataviewmodel)
+        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
 
         //TODO BOTTON PARA LA HUELLA
         OutlinedButton(
@@ -253,8 +259,10 @@ fun SingIn(
         //---------------------------Validacion de credenciales Huella----------------------
             val context = LocalContext.current
             var resp = viewModel.state.value
-            println("respuesta server $resp")
-            println("respuesta ERROR ${resp.error}")
+
+            /*println("respuesta server $resp")
+            println("respuesta ERROR ${resp.error}")*/
+
             if(resp.error == "HTTP 400"){
                 Toast.makeText(context,"No hay credenciales , Inicie con Correo y Contraseña",Toast.LENGTH_LONG).show()
             }
@@ -264,7 +272,6 @@ fun SingIn(
                     println("acceso $acceso")
                     // println("respuesta${resp.user}")
                     if (acceso == true) {
-                        //dataviewmodel.saveAll(nombre =  viewModel.nombre, correo = viewModel.correo, contraseña =viewModel.clave )
                         navController.navigate("home/${resp.user?.nombre}")
 
                     } else if (acceso == false) {
@@ -382,7 +389,6 @@ fun Buttonin(
     navController: NavController,
     correo: String,
     contraseña :String,
-    dataviewmodel : DataViewModel
 ) {
     val context = LocalContext.current
 
@@ -415,16 +421,13 @@ fun Buttonin(
                     if (acceso == true) {
 
                         Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
-                        viewModel.saveAll(
-                            nombre = user.nombre,
-                            correo = correo,
-                            contraseña = contraseña
-                        )
-                        /*dataviewmodel.saveAll(
-                            nombre = user.nombre,
-                            correo = correo,
-                            contraseña = contraseña
-                        )*/
+                        if(correo !="" ||contraseña!=""){
+                            viewModel.saveAll(
+                                nombre = user.nombre,
+                                correo = correo,
+                                contraseña = contraseña
+                            )
+                        }
                         navController.navigate("home/${resp.user?.nombre}")
                         resp.user = null
                     } else if (acceso == false) {
