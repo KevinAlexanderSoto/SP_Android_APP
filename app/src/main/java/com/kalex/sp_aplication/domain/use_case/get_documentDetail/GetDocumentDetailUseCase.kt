@@ -16,11 +16,14 @@ class GetDocumentDetailUseCase @Inject constructor(
     operator fun invoke(idRegistro:String) : Flow<Resource<DocumentDto>> = flow{
         try {
             emit(Resource.Loading<DocumentDto>())
+
             var document =  repository.getDocumentDetail(idRegistro)
 
             emit(Resource.Success<DocumentDto>(document))
+
         }catch (e: HttpException){
             emit(Resource.Error<DocumentDto>(e.localizedMessage ?: "an unexpeted error occured"))
+
         }catch (e: IOException){ // no puede comunicarse sin internet por ejemplo
             emit(Resource.Error<DocumentDto>("error internet connection"))
         }

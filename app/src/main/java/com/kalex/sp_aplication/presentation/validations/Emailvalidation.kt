@@ -21,6 +21,6 @@ class Emailvalidation() {
 }
 
 private const val EMAIL_REGEX = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})\$"
-private fun isEmailValid(email : String ):Boolean{
+fun isEmailValid(email : String ):Boolean{
  return Pattern.matches(EMAIL_REGEX,email)
 }

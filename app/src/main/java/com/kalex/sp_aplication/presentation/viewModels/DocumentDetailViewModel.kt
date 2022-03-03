@@ -11,6 +11,7 @@ import com.kalex.sp_aplication.domain.use_case.get_documents.GetDocumentsUseCase
 import com.kalex.sp_aplication.presentation.states.DocumentDetailState
 import com.kalex.sp_aplication.presentation.states.DocumentState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -32,7 +33,8 @@ class DocumentDetailViewModel @Inject constructor(
     }
 
     private fun getDocument(iddoc: String) {
-        getDocumentDetailUseCase(iddoc).onEach { result ->
+        getDocumentDetailUseCase(iddoc)
+            .onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = DocumentDetailState(document = result.data)
