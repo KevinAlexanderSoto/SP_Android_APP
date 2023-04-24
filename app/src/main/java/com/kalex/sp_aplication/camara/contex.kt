@@ -6,13 +6,13 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
     ProcessCameraProvider.getInstance(this).also { future ->
@@ -20,7 +20,7 @@ suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutin
             {
                 continuation.resume(future.get())
             },
-            executor
+            executor,
         )
     }
 }
@@ -41,7 +41,8 @@ suspend fun ImageCapture.takePicture(executor: Executor): File {
     return suspendCoroutine { continuation ->
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
         takePicture(
-            outputOptions, executor,
+            outputOptions,
+            executor,
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     continuation.resume(photoFile)
@@ -51,7 +52,7 @@ suspend fun ImageCapture.takePicture(executor: Executor): File {
                     Log.e("TakePicture", "Image capture failed", ex)
                     continuation.resumeWithException(ex)
                 }
-            }
+            },
         )
     }
 }

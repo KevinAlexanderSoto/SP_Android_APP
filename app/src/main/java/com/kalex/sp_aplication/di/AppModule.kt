@@ -13,7 +13,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
 import javax.inject.Singleton
 
 @Module
@@ -21,17 +20,17 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideSpApi():UserRetroApi{
+    fun provideSpApi(): UserRetroApi {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(UserRetroApi ::class.java)
+            .create(UserRetroApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideUserRepository(api : UserRetroApi):UserRepository{
+    fun provideUserRepository(api: UserRetroApi): UserRepository {
         return UserRepositoryImpl(api)
     }
 
@@ -40,5 +39,4 @@ object AppModule {
     fun provideApplication(@ApplicationContext app: Context): SpApplication {
         return app as SpApplication
     }
-
 }

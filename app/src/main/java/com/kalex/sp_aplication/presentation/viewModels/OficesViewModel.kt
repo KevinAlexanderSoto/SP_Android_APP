@@ -17,14 +17,14 @@ import javax.inject.Inject
 @HiltViewModel
 class OficesViewModel @Inject constructor(
     private val getOficesUseCase: GetOficesUseCase,
-    private val settingsDataStore: SettingsDataStore
-): ViewModel(){
+    private val settingsDataStore: SettingsDataStore,
+) : ViewModel() {
 
     private val _state = mutableStateOf(OficeState())
     val state: State<OficeState> = _state
-    var correo :String = ""
+    var correo: String = ""
 
-    var userLocation : LatLng = LatLng(6.217,-75.567)
+    var userLocation: LatLng = LatLng(6.217, -75.567)
 
     init {
         val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
@@ -32,7 +32,6 @@ class OficesViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         getOfices()
-
     }
 
     private fun getOfices() {
@@ -43,7 +42,7 @@ class OficesViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _state.value = OficeState(
-                        error = result.message ?: "An unexpected error occured"
+                        error = result.message ?: "An unexpected error occured",
                     )
                 }
                 is Resource.Loading -> {

@@ -40,15 +40,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.test.core.app.ActivityScenario.launch
-
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Icono
 import com.kalex.sp_aplication.presentation.composables.Imagen
-
 import com.kalex.sp_aplication.presentation.theme.SPAplicationTheme
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
@@ -56,68 +53,66 @@ import com.kalex.sp_aplication.presentation.ui.*
 import com.kalex.sp_aplication.presentation.validations.Emailvalidation
 import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
 import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity () {
-    lateinit var viewModel :UserViewModel
-    lateinit var viewModelData :DataViewModel
+class MainActivity : ComponentActivity() {
+    lateinit var viewModel: UserViewModel
+    lateinit var viewModelData: DataViewModel
     private var cancellationSignal: CancellationSignal? = null
+
     @ExperimentalPermissionsApi
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState,)
+        super.onCreate(savedInstanceState)
 
         setContent {
-            viewModel  = hiltViewModel()
+            viewModel = hiltViewModel()
             viewModelData = hiltViewModel()
             viewModelData.settingsPrefs
             SPAplicationTheme {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = Constants.MainNavItem)
-                {
-                    composable(Constants.MainNavItem){
+                    startDestination = Constants.MainNavItem,
+                ) {
+                    composable(Constants.MainNavItem) {
                         SingIn(
                             navController,
                             viewModel,
-                            onfiger = { launchBiometric() }
+                            onfiger = { launchBiometric() },
                         )
                     }
                     composable(
-                        Constants.HomeNavItem
-                    ){
-                            backStackEntry->
-                        val nombre= backStackEntry.arguments?.getString("nombre")
+                        Constants.HomeNavItem,
+                    ) {
+                            backStackEntry ->
+                        val nombre = backStackEntry.arguments?.getString("nombre")
                         requireNotNull(nombre)
-                        Home(navController,nombre)
-
+                        Home(navController, nombre)
                     }
-                    composable(Constants.SendDocNavItem){
+                    composable(Constants.SendDocNavItem) {
                         EnviarDocumento(navController)
                     }
-                    composable(Constants.getDocNavItem){
+                    composable(Constants.getDocNavItem) {
                         VerDocumentos(navController)
                     }
-                    composable(Constants.getDocDetailNavItem){
-                            backStackEntry->
-                        val idRegistro= backStackEntry.arguments?.getString("idRegistro")
+                    composable(Constants.getDocDetailNavItem) {
+                            backStackEntry ->
+                        val idRegistro = backStackEntry.arguments?.getString("idRegistro")
                         requireNotNull(idRegistro)
                         VerDocumento(navController, idRegistro = idRegistro)
                     }
-                    composable(Constants.oficesNavItem){
+                    composable(Constants.oficesNavItem) {
                         VerOficinas(navController)
                     }
                 }
-
             }
         }
     }
 
-    private  val authenticationCallback: BiometricPrompt.AuthenticationCallback =
+    private val authenticationCallback: BiometricPrompt.AuthenticationCallback =
         @RequiresApi(Build.VERSION_CODES.P)
         object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
@@ -125,8 +120,8 @@ class MainActivity : ComponentActivity () {
                 var email = viewModelData.correo
                 var contraseña = viewModelData.constraseña
 
-                viewModel.getUser(email,contraseña)
-                viewModel.saveLogin(correo = email,contraseña = contraseña)
+                viewModel.getUser(email, contraseña)
+                viewModel.saveLogin(correo = email, contraseña = contraseña)
                 Toast.makeText(this@MainActivity, "Huella correcta", Toast.LENGTH_SHORT).show()
             }
 
@@ -158,7 +153,6 @@ class MainActivity : ComponentActivity () {
         return packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
     }
 
-
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun launchBiometric() {
         if (checkBiometricSupport()) {
@@ -168,19 +162,15 @@ class MainActivity : ComponentActivity () {
                     setSubtitle(getString(R.string.prompt_info_subtitle))
                     setDescription(getString(R.string.prompt_info_description))
                     setConfirmationRequired(false)
-                    setNegativeButton(getString(R.string.prompt_info_use_app_password), mainExecutor, { _, _, ->
+                    setNegativeButton(getString(R.string.prompt_info_use_app_password), mainExecutor, { _, _ ->
                         Toast.makeText(this@MainActivity, "Authentication Cancelled", Toast.LENGTH_SHORT).show()
                     })
                 }.build()
             biometricPrompt.authenticate(getCancellationSignal(), mainExecutor, authenticationCallback)
-
         }
-
     }
 
-
-
-    private  fun getCancellationSignal(): CancellationSignal {
+    private fun getCancellationSignal(): CancellationSignal {
         cancellationSignal = CancellationSignal()
         cancellationSignal?.setOnCancelListener {
             Toast.makeText(this, "Authentication Cancelled Signal", Toast.LENGTH_SHORT).show()
@@ -188,36 +178,36 @@ class MainActivity : ComponentActivity () {
 
         return cancellationSignal as CancellationSignal
     }
-
 }
 
 @Composable
 fun SingIn(
     navController: NavController,
-    viewModel : UserViewModel ,
+    viewModel: UserViewModel,
     onfiger: () -> Unit,
-    dataviewmodel : DataViewModel = hiltViewModel()
-){
-
+    dataviewmodel: DataViewModel = hiltViewModel(),
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),// para hacer scroll
+            .verticalScroll(rememberScrollState()), // para hacer scroll
         verticalArrangement = Arrangement.spacedBy(11.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        Imagen(url = R.drawable.logo_sophos_home, modifier = Modifier
-            .height(210.dp)
-            .width(350.dp)
-            .padding(15.dp) )
+        Imagen(
+            url = R.drawable.logo_sophos_home,
+            modifier = Modifier
+                .height(210.dp)
+                .width(350.dp)
+                .padding(15.dp),
+        )
 
         Textfield("Ingresa tus datos para acceder")
 
         // manejar focus de los texto,
         val localFocusManager = LocalFocusManager.current
 
-        //state hoisting Email
+        // state hoisting Email
         val text = remember { Emailvalidation() }
 
         EmailField(
@@ -226,80 +216,75 @@ fun SingIn(
             onAction = {
                 // bajar al siguiente field
                 localFocusManager.moveFocus(FocusDirection.Down)
-            }
-        ){
-
+            },
+        ) {
             text.correo = it
             text.validate()
         }
 
-        //state hoisting Password
+        // state hoisting Password
         var password = remember { mutableStateOf("") }
-        PasswordFiels(password.value, onAction ={ localFocusManager.clearFocus()})
-        { password.value = it
+        PasswordFiels(password.value, onAction = { localFocusManager.clearFocus() }) {
+            password.value = it
         }
 
-        //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
+        // var resp = viewModel.state.value
+        Buttonin(habilitado = text.valid(), viewModel, navController, text.correo, password.value)
 
-        //TODO BOTTON PARA LA HUELLA
+        // TODO BOTTON PARA LA HUELLA
         OutlinedButton(
             onClick = {
                 onfiger()
-                      },
+            },
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .fillMaxWidth(0.8f),
             border = BorderStroke(1.dp, Color.Black),
             contentPadding = PaddingValues(12.dp),
             shape = RoundedCornerShape(23.dp),
-            //enabled = habilitado
+            // enabled = habilitado
         ) {
-
-        //---------------------------Validacion de credenciales Huella----------------------
+            // ---------------------------Validacion de credenciales Huella----------------------
             val context = LocalContext.current
             var resp = viewModel.state.value
 
             /*println("respuesta server $resp")
             println("respuesta ERROR ${resp.error}")*/
 
-            if(resp.error == "HTTP 400"){
-                Toast.makeText(context,"No hay credenciales , Inicie con Correo y Contraseña",Toast.LENGTH_LONG).show()
+            if (resp.error == "HTTP 400") {
+                Toast.makeText(context, "No hay credenciales , Inicie con Correo y Contraseña", Toast.LENGTH_LONG).show()
             }
-            if(resp.user != null) {
+            if (resp.user != null) {
                 resp.user?.let { user ->
                     val acceso = user.acceso
                     println("acceso $acceso")
                     // println("respuesta${resp.user}")
                     if (acceso == true) {
                         navController.navigate("home/${resp.user?.nombre}")
-
                     } else if (acceso == false) {
-                        //Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
-
+                        // Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
                     }
                 }
             }
 
-//--------------------Composables del Boton -----------------------------------------
-            Icono(R.drawable.baseline_fingerprint_24,35)
+// --------------------Composables del Boton -----------------------------------------
+            Icono(R.drawable.baseline_fingerprint_24, 35)
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            ButtonText("Ingresar con huella",22)
+            ButtonText("Ingresar con huella", 22)
         }
 
         /*ButtonHuella(text.valid()){
             onfiger()
         }//,onfinger*/
     }
-
-
 }
 
 @Composable
-fun Textfield(texto: String ) {
-    Text(text = texto,
+fun Textfield(texto: String) {
+    Text(
+        text = texto,
         style = MaterialTheme.typography.h6,
-        color = MaterialTheme.colors.secondary
+        color = MaterialTheme.colors.secondary,
     )
 }
 
@@ -308,18 +293,15 @@ fun EmailField(
     text: String,
     error: String?,
     onAction: () -> Unit,
-    onEmailChanged: (String) -> Unit
+    onEmailChanged: (String) -> Unit,
 ) {
-
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-
         TextField(
             value = text,
             singleLine = true,
-            onValueChange = { onEmailChanged(it)},
+            onValueChange = { onEmailChanged(it) },
             label = { Text(text = "Email") },
             placeholder = { Text("example@gmail.com") },
             modifier = Modifier
@@ -328,18 +310,19 @@ fun EmailField(
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                textColor = MaterialTheme.colors.secondary
+                textColor = MaterialTheme.colors.secondary,
             ),
             shape = RoundedCornerShape(9.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ) ,
-            keyboardActions = KeyboardActions (onNext = {
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(onNext = {
                 onAction()
             }),
-            isError = error != null
+            isError = error != null,
         )
-        error?.let{ FielError(it) }
+        error?.let { FielError(it) }
     }
 }
 
@@ -347,7 +330,7 @@ fun EmailField(
 fun FielError(it: String) {
     Text(
         text = it,
-        style = TextStyle(color = MaterialTheme.colors.error)
+        style = TextStyle(color = MaterialTheme.colors.error),
     )
 }
 
@@ -355,111 +338,101 @@ fun FielError(it: String) {
 fun PasswordFiels(
     pass: String,
     onAction: () -> Unit,
-    onPasswordChange: (String) -> Unit
+    onPasswordChange: (String) -> Unit,
 ) {
     TextField(
         value = pass,
         onValueChange = { onPasswordChange(it) },
-        label = { Text("Contraseña" ) },
+        label = { Text("Contraseña") },
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth(0.9f),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            textColor = MaterialTheme.colors.secondary
+            textColor = MaterialTheme.colors.secondary,
         ),
         shape = RoundedCornerShape(9.dp),
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ) ,
-        keyboardActions = KeyboardActions (onDone = {
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(onDone = {
             onAction()
         }),
 
-        )
+    )
 }
-var contToast =0
+var contToast = 0
+
 @Composable
 fun Buttonin(
     habilitado: Boolean,
     viewModel: UserViewModel,
     navController: NavController,
     correo: String,
-    contraseña :String,
+    contraseña: String,
 ) {
     val context = LocalContext.current
 
     Button(
         onClick = {
-            viewModel.getUser(correo,contraseña)
+            viewModel.getUser(correo, contraseña)
             contToast = 0
         },
         modifier = Modifier
             .padding(top = 30.dp)
-            .fillMaxWidth(0.8f)
-        ,
+            .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(23.dp),
         contentPadding = PaddingValues(12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = spcolor,
-            contentColor = blanco
+            contentColor = blanco,
         ),
-        enabled = habilitado
+        enabled = habilitado,
     ) {
         var resp = viewModel.state.value
-            if (resp.user != null) {
-
-                //println("Respuesta de server: $resp")
-                resp.user?.let { user ->
-                    val acceso = user.acceso
-                    println("acceso $acceso")
-                    // println("respuesta${resp.user}")
-                    if (acceso == true) {
-
-                        Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
-                        if(correo !="" ||contraseña!=""){
-                            viewModel.saveAll(
-                                nombre = user.nombre,
-                                correo = correo,
-                                contraseña = contraseña
-                            )
-                        }
-                        navController.navigate("home/${resp.user?.nombre}")
-                        resp.user = null
-                    } else if (acceso == false) {
-
-                        if(contToast < 1){
-                            Toast.makeText(
-                                context,
-                                "El Correo o la Contraseña son incorrectos",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            contToast++
-                        }
-
-
+        if (resp.user != null) {
+            // println("Respuesta de server: $resp")
+            resp.user?.let { user ->
+                val acceso = user.acceso
+                println("acceso $acceso")
+                // println("respuesta${resp.user}")
+                if (acceso == true) {
+                    Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
+                    if (correo != "" || contraseña != "") {
+                        viewModel.saveAll(
+                            nombre = user.nombre,
+                            correo = correo,
+                            contraseña = contraseña,
+                        )
                     }
-
+                    navController.navigate("home/${resp.user?.nombre}")
+                    resp.user = null
+                } else if (acceso == false) {
+                    if (contToast < 1) {
+                        Toast.makeText(
+                            context,
+                            "El Correo o la Contraseña son incorrectos",
+                            Toast.LENGTH_LONG,
+                        ).show()
+                        contToast++
+                    }
                 }
-
+            }
         }
 
-
-        Icono(R.drawable.outline_login_24,30)
+        Icono(R.drawable.outline_login_24, 30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar",22)
-
+        ButtonText("Ingresar", 22)
     }
-    //if(resp.isLoading) CircularProgressIndicator()
+    // if(resp.isLoading) CircularProgressIndicator()
 }
 
-
 @Composable
-fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
+fun ButtonHuella(habilitado: Boolean, onfiger: () -> Unit) { // ,
     OutlinedButton(
         onClick = { onfiger() },
         modifier = Modifier
@@ -468,11 +441,10 @@ fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        //enabled = habilitado
+        // enabled = habilitado
     ) {
-        Icono(R.drawable.baseline_fingerprint_24,35)
+        Icono(R.drawable.baseline_fingerprint_24, 35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar con huella",22)
+        ButtonText("Ingresar con huella", 22)
     }
 }
-

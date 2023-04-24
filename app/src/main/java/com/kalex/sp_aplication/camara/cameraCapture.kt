@@ -6,10 +6,8 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.util.Size
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
@@ -28,22 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.kalex.sp_aplication.presentation.composables.Imagen
-import com.kalex.sp_aplication.presentation.ui.EMPTY_IMAGE_URI
-import com.kalex.sp_aplication.presentation.validations.getFileSizeFloat
-import com.kalex.usodecamara.galeria.GallerySelect
-import java.io.File
 import kotlinx.coroutines.launch
+import java.io.File
 
 @ExperimentalPermissionsApi
 @Composable
 fun CameraCapture(
     modifier: Modifier = Modifier,
     cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA,
-    onImageFile: (File) -> Unit = { }
+    onImageFile: (File) -> Unit = { },
 ) {
     val context = LocalContext.current
     Permission(
@@ -58,14 +50,14 @@ fun CameraCapture(
                         context.startActivity(
                             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                                 data = Uri.fromParts("package", context.packageName, null)
-                            }
+                            },
                         )
-                    }
+                    },
                 ) {
                     Text("Open Settings")
                 }
             }
-        }
+        },
     ) {
         Box(modifier = modifier) {
             val lifecycleOwner = LocalLifecycleOwner.current
@@ -74,10 +66,9 @@ fun CameraCapture(
             val imageCaptureUseCase by remember {
                 mutableStateOf(
                     ImageCapture.Builder()
-                        .setTargetResolution(Size(480,640))//para la resolucion
+                        .setTargetResolution(Size(480, 640)) // para la resolucion
                         .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
-                        .build()
-
+                        .build(),
 
                 )
             }
@@ -86,7 +77,7 @@ fun CameraCapture(
                     modifier = Modifier.fillMaxSize(),
                     onUseCase = {
                         previewUseCase = it
-                    }
+                    },
                 )
                 Button(
                     modifier = Modifier
@@ -95,11 +86,11 @@ fun CameraCapture(
                         .align(Alignment.BottomCenter),
                     onClick = {
                         coroutineScope.launch {
-                            imageCaptureUseCase.takePicture(context.executor).let { it->
+                            imageCaptureUseCase.takePicture(context.executor).let { it ->
                                 onImageFile(it)
                             }
                         }
-                    }
+                    },
                 ) {
                     Text("Capturar")
                 }
@@ -110,7 +101,10 @@ fun CameraCapture(
                     // Must unbind the use-cases before rebinding them.
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
-                        lifecycleOwner, cameraSelector, previewUseCase, imageCaptureUseCase
+                        lifecycleOwner,
+                        cameraSelector,
+                        previewUseCase,
+                        imageCaptureUseCase,
                     )
                 } catch (ex: Exception) {
                     Log.e("CameraCapture", "Failed to bind camera use cases", ex)
@@ -119,4 +113,3 @@ fun CameraCapture(
         }
     }
 }
-

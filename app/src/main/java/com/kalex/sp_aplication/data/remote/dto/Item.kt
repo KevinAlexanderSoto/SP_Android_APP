@@ -12,7 +12,7 @@ data class ItemDto(
     val Identificacion: String,
     val Nombre: String,
     val TipoAdjunto: String,
-    val TipoId: String
+    val TipoId: String,
 )
 
 fun ItemDto.toItem(): Item {
@@ -22,6 +22,6 @@ fun ItemDto.toItem(): Item {
         Fecha = Fecha,
         IdRegistro = IdRegistro,
         Nombre = Nombre,
-        TipoAdjunto = TipoAdjunto
+        TipoAdjunto = TipoAdjunto,
     )
 }

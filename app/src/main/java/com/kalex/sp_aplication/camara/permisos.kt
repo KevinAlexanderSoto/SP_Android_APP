@@ -14,7 +14,7 @@ fun Permission(
     permission: String = android.Manifest.permission.CAMERA,
     rationale: String = "Esto es importante para el funcionamiento de la Aplicacion",
     permissionNotAvailableContent: @Composable () -> Unit = { },
-    content: @Composable () -> Unit = { }
+    content: @Composable () -> Unit = { },
 ) {
     val permissionState = rememberPermissionState(permission)
     PermissionRequired(
@@ -22,18 +22,18 @@ fun Permission(
         permissionNotGrantedContent = {
             Rationale(
                 text = rationale,
-                onRequestPermission = { permissionState.launchPermissionRequest() }
+                onRequestPermission = { permissionState.launchPermissionRequest() },
             )
         },
         permissionNotAvailableContent = permissionNotAvailableContent,
-        content = content
+        content = content,
     )
 }
 
 @Composable
 private fun Rationale(
     text: String,
-    onRequestPermission: () -> Unit
+    onRequestPermission: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { /* Don't */ },
@@ -47,6 +47,6 @@ private fun Rationale(
             Button(onClick = onRequestPermission) {
                 Text("Ok")
             }
-        }
+        },
     )
 }

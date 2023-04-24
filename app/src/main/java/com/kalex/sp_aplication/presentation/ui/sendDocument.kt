@@ -2,13 +2,14 @@ package com.kalex.sp_aplication.presentation.ui
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.util.Base64
 import android.widget.Toast
 import androidx.compose.foundation.*
-import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,10 +20,13 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -33,6 +37,8 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.camara.CameraCapture
+import com.kalex.sp_aplication.common.getCapturedImage
+import com.kalex.sp_aplication.common.getGaleryImage
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Drawer
 import com.kalex.sp_aplication.presentation.composables.Icono
@@ -52,51 +58,45 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import com.kalex.sp_aplication.common.getCapturedImage
 import java.io.ByteArrayOutputStream
-import android.util.Base64
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalFocusManager
-import com.kalex.sp_aplication.common.getGaleryImage
 import java.io.IOException
 import java.io.InputStream
 import kotlin.collections.ArrayList
-
 
 @ExperimentalPermissionsApi
 @Composable
 fun EnviarDocumento(
     navController: NavHostController,
     oficesViewModel: OficesViewModel = hiltViewModel(),
-    postDocumentViewModel : PostDocumentViewModel = hiltViewModel()
+    postDocumentViewModel: PostDocumentViewModel = hiltViewModel(),
 ) {
-
     val resp = oficesViewModel.state.value
     val correo = oficesViewModel.correo
-    //para barra lateral
+    // para barra lateral
     val scaffoldState = rememberScaffoldState(
-        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     )
     val scope = rememberCoroutineScope()
 
-    //barra de cargando
-    if (resp.isLoading){
-        Box(modifier = Modifier.fillMaxSize()
-            , contentAlignment = Alignment.Center
-        ){
-            CircularProgressIndicator(modifier = Modifier
-                .fillMaxSize(0.1f)
+    // barra de cargando
+    if (resp.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxSize(0.1f),
 
             )
         }
     }
-    //Logica para obtener ciudades de la API
+    // Logica para obtener ciudades de la API
     if (!resp.isLoading) {
         val ciudades = ArrayList<String>()
         for (ciudad in resp.ofices?.Items!!) {
-            if (!ciudades.contains(ciudad.Ciudad)){
-            ciudades.add(ciudad.Ciudad)}
+            if (!ciudades.contains(ciudad.Ciudad)) {
+                ciudades.add(ciudad.Ciudad) }
         }
 
         ToolBar(
@@ -105,55 +105,57 @@ fun EnviarDocumento(
             scope,
             scaffoldState,
             correo,
-            postDocumentViewModel
+            postDocumentViewModel,
         )
-
     }
 }
+
 @ExperimentalPermissionsApi
 @Composable
 fun ToolBar(
-    navController :NavHostController,
-    ciudades:ArrayList<String>,
+    navController: NavHostController,
+    ciudades: ArrayList<String>,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     correo: String,
-    postDocumentViewModel : PostDocumentViewModel
-){
+    postDocumentViewModel: PostDocumentViewModel,
+) {
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-        TopAppBar(
-            title = { Text(text = "Envio de Documentación") },
-            navigationIcon = {
-                IconButton(onClick = {
-                    navController.popBackStack()
-                }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "go back"
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = {
-                    scope.launch {
-                    scaffoldState.drawerState.open()
-                } }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "menu hamburgesa"
-                    )
-                }
-            },
-        )
-    },
+            TopAppBar(
+                title = { Text(text = "Envio de Documentación") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "go back",
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "menu hamburgesa",
+                        )
+                    }
+                },
+            )
+        },
         drawerContent = { Drawer(scope, scaffoldState, navController) },
-        drawerGesturesEnabled = true
+        drawerGesturesEnabled = true,
 
-        ) {
-        FormularioDoc(ciudades,correo,postDocumentViewModel)
+    ) {
+        FormularioDoc(ciudades, correo, postDocumentViewModel)
     }
 }
 
@@ -162,112 +164,103 @@ fun ToolBar(
 fun FormularioDoc(
     ciudades: ArrayList<String>,
     correo: String,
-    postDocumentViewModel: PostDocumentViewModel
+    postDocumentViewModel: PostDocumentViewModel,
 
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),// para hacer scroll
+            .verticalScroll(rememberScrollState()), // para hacer scroll
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-            ){
-
-        //------------------------------------Formulario---------------------------------
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // ------------------------------------Formulario---------------------------------
         val listaDocumento = listOf("CC", "TI", "CE", "PA")
         val listaTipoAdjunto = listOf("Certificado de cuenta", "Cédula", "Factura", "Incapacidad")
         // manejar focus de los texto,
         val localFocusManager = LocalFocusManager.current
         Spacer(Modifier.size(4.dp))
 
-        val menu1= dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
-        val text1 :String = InputText(label = "Numero de documento",onAction = {
+        val menu1 = dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
+        val text1: String = InputText(label = "Numero de documento", onAction = {
             // bajar al siguiente field
             localFocusManager.moveFocus(FocusDirection.Down)
         })
-        val text2 = InputText(label = "Nombre",onAction = {
+        val text2 = InputText(label = "Nombre", onAction = {
             // bajar al siguiente field
             localFocusManager.moveFocus(FocusDirection.Down)
         })
-        val text3 = InputText(label = "Apellido",onAction = {
+        val text3 = InputText(label = "Apellido", onAction = {
             // bajar al siguiente field
             localFocusManager.moveFocus(FocusDirection.Down)
         })
-        val text4 = InputText(label = "Correo",correo,onAction = {
+        val text4 = InputText(label = "Correo", correo, onAction = {
             // bajar al siguiente field
             localFocusManager.moveFocus(FocusDirection.Down)
         })
-        val menu2=dropDownMenu(ciudades, nombreInput = "Ciudad")
-        val menu3=dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
+        val menu2 = dropDownMenu(ciudades, nombreInput = "Ciudad")
+        val menu3 = dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
 
-       //------------------------------------Para la foto---------------------------------
-        var tomarFoto =  false
-        var cargarFoto =  false
+        // ------------------------------------Para la foto---------------------------------
+        var tomarFoto = false
+        var cargarFoto = false
         val context = LocalContext.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement=Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(4.dp)
-            ){
-            cargarFoto= BtncargarImg("Cargar img",R.drawable.cloud_upload_24)
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .padding(4.dp),
+        ) {
+            cargarFoto = BtncargarImg("Cargar img", R.drawable.cloud_upload_24)
 
-                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                tomarFoto= BtncargarImg("Tomar foto",R.drawable.add_a_photo_24)
+            tomarFoto = BtncargarImg("Tomar foto", R.drawable.add_a_photo_24)
+        }
 
-            }
+        var UriImg: Uri = Uri.parse("file://dev/null")
 
-        var UriImg :Uri = Uri.parse("file://dev/null")
+        // inicializar variable Bitmap
+        var imgBitmap: Bitmap? = assetsToBitmap("ic_launcher_background", context)
 
-        //inicializar variable Bitmap
-        var imgBitmap :Bitmap? = assetsToBitmap("ic_launcher_background",context)
+        println("Presiono botton foto : " + tomarFoto)
+        println("Presiono botton galeria : " + cargarFoto)
 
-
-        println("Presiono botton foto : "+tomarFoto)
-        println("Presiono botton galeria : "+cargarFoto)
-
-//----------------------Obtener foto desde La CAMARA---------------------------
-        if(tomarFoto && !cargarFoto){
+// ----------------------Obtener foto desde La CAMARA---------------------------
+        if (tomarFoto && !cargarFoto) {
             UriImg = capturaraImg(
                 modifier = Modifier,
             )
-            if(UriImg != EMPTY_IMAGE_URI ) {
+            if (UriImg != EMPTY_IMAGE_URI) {
                 imgBitmap = getCapturedImage(UriImg)
-
             }
         }
-//----------------------Obtener foto desde Galeria---------------------------
-        if (cargarFoto){
+// ----------------------Obtener foto desde Galeria---------------------------
+        if (cargarFoto) {
             UriImg = capturaraImgGaleria(
                 modifier = Modifier,
             )
 
-            if(UriImg != EMPTY_IMAGE_URI ) {
+            if (UriImg != EMPTY_IMAGE_URI) {
                 imgBitmap = getGaleryImage(UriImg, context)
-
             }
         }
 
-
-
-
-//-------------------validaciones para habilitar enviar data---------------------------
-        var validacion :Boolean = false
-        if (imgBitmap != null){
-           validacion = validarString(text1)&&validarString(text2)&&validarString(text3) &&validarString(text4)&&validarString(menu1)&&validarString(menu2)&&validarString(menu3)
-
+// -------------------validaciones para habilitar enviar data---------------------------
+        var validacion: Boolean = false
+        if (imgBitmap != null) {
+            validacion = validarString(text1) && validarString(text2) && validarString(text3) && validarString(text4) && validarString(menu1) && validarString(menu2) && validarString(menu3)
         }
 
-//-------------------Armado del body para Post Document---------------------------
-        //Crear Body para mandar
-        var requestBody : RequestBody? =null
+// -------------------Armado del body para Post Document---------------------------
+        // Crear Body para mandar
+        var requestBody: RequestBody? = null
 
-        if(validacion){
-//-------------------Convertir Base 64---------------------------
+        if (validacion) {
+// -------------------Convertir Base 64---------------------------
             val imgBse64 = imgBitmap?.toBase64String()
-            val imgBase64Encabezado = "data:image/jpeg;base64,"+ imgBse64
+            val imgBase64Encabezado = "data:image/jpeg;base64," + imgBse64
 
             // Create JSON using JSONObject
             val jsonObject = JSONObject()
@@ -285,40 +278,36 @@ fun FormularioDoc(
             requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
         }
 
-        BtnEnviarImg(validacion,postDocumentViewModel,requestBody)
-
+        BtnEnviarImg(validacion, postDocumentViewModel, requestBody)
     }
-
 }
 
-//Convertir a Bitmap desde el file name NO SE USA , PERO ES INTEREZANTE
-fun assetsToBitmap(fileName:String,context : Context): Bitmap?{
-
-    return try{
-        val stream : InputStream  = context.assets.open(fileName)
+// Convertir a Bitmap desde el file name NO SE USA , PERO ES INTEREZANTE
+fun assetsToBitmap(fileName: String, context: Context): Bitmap? {
+    return try {
+        val stream: InputStream = context.assets.open(fileName)
         BitmapFactory.decodeStream(stream)
-    }catch (e: IOException){
+    } catch (e: IOException) {
         e.printStackTrace()
         null
     }
 }
 
-
 // extension function to encode bitmap to base64 string
-fun Bitmap.toBase64String():String{
+fun Bitmap.toBase64String(): String {
     ByteArrayOutputStream().apply {
-        compress(Bitmap.CompressFormat.JPEG,90,this)
-        return Base64.encodeToString(toByteArray(),Base64.DEFAULT)
+        compress(Bitmap.CompressFormat.JPEG, 90, this)
+        return Base64.encodeToString(toByteArray(), Base64.DEFAULT)
     }
 }
 
 @Composable
 fun InputText(
-label : String,
-initialValue :String="",
-onAction: () -> Unit
-):String{
-    var text by remember { mutableStateOf(initialValue ) }
+    label: String,
+    initialValue: String = "",
+    onAction: () -> Unit,
+): String {
+    var text by remember { mutableStateOf(initialValue) }
     TextField(
         value = text,
         singleLine = true,
@@ -328,80 +317,83 @@ onAction: () -> Unit
             .fillMaxWidth(0.9f)
             .background(Color.White),
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
         ),
-        keyboardActions = KeyboardActions (onDone = {
+        keyboardActions = KeyboardActions(onDone = {
             onAction()
         }),
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent
-        )
+            backgroundColor = Color.Transparent,
+        ),
     )
-        return text
+    return text
 }
 
 @Composable
 fun dropDownMenu(
     listaDocumento: List<String>,
-    nombreInput:String):String
-{
-
+    nombreInput: String,
+): String {
     var expanded by remember { mutableStateOf(false) }
     val suggestions = listaDocumento
     var selectedText by remember { mutableStateOf("") }
 
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
-    val icon = if (expanded)
+    val icon = if (expanded) {
         Icons.Filled.KeyboardArrowUp
-    else
+    } else {
         Icons.Filled.KeyboardArrowDown
+    }
 
     Column {
-    TextField(
-        value = selectedText,
-        onValueChange = { selectedText = it },
-        readOnly = true,
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .onGloballyPositioned { coordinates ->
-                //This value is used to assign to the DropDown the same width
-                textfieldSize = coordinates.size.toSize()
-            }
-            .background(Color.White),
-        label = { Text(nombreInput) },
-        trailingIcon = {
-            Icon(icon, "contentDescription",
-                Modifier.clickable { expanded = !expanded })
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent
+        TextField(
+            value = selectedText,
+            onValueChange = { selectedText = it },
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .onGloballyPositioned { coordinates ->
+                    // This value is used to assign to the DropDown the same width
+                    textfieldSize = coordinates.size.toSize()
+                }
+                .background(Color.White),
+            label = { Text(nombreInput) },
+            trailingIcon = {
+                Icon(
+                    icon,
+                    "contentDescription",
+                    Modifier.clickable { expanded = !expanded },
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+            ),
         )
-    )
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        modifier = Modifier
-            .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
-    ) {
-        suggestions.forEach { label ->
-            DropdownMenuItem(onClick = {
-                selectedText = label
-                expanded = false
-            }) {
-                Text(text = label)
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { textfieldSize.width.toDp() }),
+        ) {
+            suggestions.forEach { label ->
+                DropdownMenuItem(onClick = {
+                    selectedText = label
+                    expanded = false
+                }) {
+                    Text(text = label)
+                }
             }
         }
     }
-}
-        return selectedText
+    return selectedText
 }
 
 @Composable
 fun BtnEnviarImg(
     validacion: Boolean,
     postDocumentViewModel: PostDocumentViewModel,
-    requestBody: RequestBody?
+    requestBody: RequestBody?,
 ) {
     val context = LocalContext.current
     Button(
@@ -412,34 +404,30 @@ fun BtnEnviarImg(
             runBlocking {
                 delay(100)
             }
-
-
         },
         modifier = Modifier
             .padding(top = 25.dp, bottom = 12.dp)
-            .fillMaxWidth(0.8f)
-        ,
+            .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(23.dp),
         contentPadding = PaddingValues(9.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = spcolor,
-            contentColor = blanco
+            contentColor = blanco,
         ),
-        enabled = validacion
+        enabled = validacion,
     ) {
         var resp = postDocumentViewModel.state
         resp.value.respuesta
         println(resp.value)
-        if(resp.value.respuesta != null){
-            Toast.makeText(context,"Documento Enviado Exitosamente",Toast.LENGTH_LONG).show()
+        if (resp.value.respuesta != null) {
+            Toast.makeText(context, "Documento Enviado Exitosamente", Toast.LENGTH_LONG).show()
             println(resp.value)
         }
 
-        Icono(R.drawable.send_24,25)
+        Icono(R.drawable.send_24, 25)
         Spacer(Modifier.size(4.dp))
-        ButtonText("Enviar",20)
-
+        ButtonText("Enviar", 20)
     }
 }
 
@@ -447,43 +435,39 @@ fun BtnEnviarImg(
 @Composable
 fun BtncargarImg(
     texto: String,
-    icono :Any
-):Boolean{
-
+    icono: Any,
+): Boolean {
     var click by remember { mutableStateOf(false) }
     Button(
         onClick = {
             click = true
         },
         modifier = Modifier
-            .padding(top = 23.dp)
-            ,
+            .padding(top = 23.dp),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(9.dp),
         contentPadding = PaddingValues(8.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = spcolor,
-            contentColor = blanco
+            contentColor = blanco,
         ),
-        enabled = true
+        enabled = true,
     ) {
-
-        Icono(icono,20)
+        Icono(icono, 20)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText(texto,15)
-
+        ButtonText(texto, 15)
     }
 
     return click
 }
 
-//funcion para capturar img
+// funcion para capturar img
 @ExperimentalPermissionsApi
 @Composable
 fun capturaraImg(
     modifier: Modifier = Modifier,
-    onimagenTomada: (Uri) -> Unit = { }
-):Uri {
+    onimagenTomada: (Uri) -> Unit = { },
+): Uri {
     var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
     val context = LocalContext.current
     if (imageUri != EMPTY_IMAGE_URI) {
@@ -491,36 +475,33 @@ fun capturaraImg(
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Imagen(
-                imageUri, modifier = Modifier
+                imageUri,
+                modifier = Modifier
                     .height(400.dp)
                     .width(500.dp)
-                    .padding(10.dp)
+                    .padding(10.dp),
             )
 
             Button(
                 modifier = Modifier,
                 onClick = {
                     imageUri = EMPTY_IMAGE_URI
-                }
+                },
             ) {
                 Text("Eliminar imagen")
             }
         }
-
-
     } else {
-
-            CameraCapture(
-                modifier = modifier,
-                onImageFile = { file ->
-                    imageUri = file.toUri()
-                    //-------------------validaciones para tamaño de imagenes---------------------------
-                    val uriSize = imageUri.toFile().getFileSizeFloat()
-                    //Validacion de Tamaño , pero no es necesaria , ya que al comprimir la IMG se setea el tamaño
+        CameraCapture(
+            modifier = modifier,
+            onImageFile = { file ->
+                imageUri = file.toUri()
+                // -------------------validaciones para tamaño de imagenes---------------------------
+                val uriSize = imageUri.toFile().getFileSizeFloat()
+                // Validacion de Tamaño , pero no es necesaria , ya que al comprimir la IMG se setea el tamaño
                    /* if (uriSize > 1000) {
                         Toast.makeText(
                             context,
@@ -529,19 +510,19 @@ fun capturaraImg(
                         ).show()
                         imageUri = EMPTY_IMAGE_URI
                     }*/
-                }
-            )
+            },
+        )
     }
     return imageUri
 }
 
-//funcion para capturar img y validar su tamaño
+// funcion para capturar img y validar su tamaño
 @ExperimentalPermissionsApi
 @Composable
 fun capturaraImgGaleria(
     modifier: Modifier = Modifier,
-    onimagenTomada: (Uri) -> Unit = { }
-):Uri {
+    onimagenTomada: (Uri) -> Unit = { },
+): Uri {
     var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
 
     if (imageUri != EMPTY_IMAGE_URI) {
@@ -549,38 +530,34 @@ fun capturaraImgGaleria(
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Imagen(
-                imageUri, modifier = Modifier
+                imageUri,
+                modifier = Modifier
                     .height(400.dp)
                     .width(500.dp)
-                    .padding(10.dp)
+                    .padding(10.dp),
             )
 
             Button(
                 modifier = Modifier,
                 onClick = {
                     imageUri = EMPTY_IMAGE_URI
-                }
+                },
             ) {
                 Text("Eliminar imagen")
             }
         }
-
-
     } else {
         GallerySelect(
             modifier = modifier,
             onImageUri = { uri ->
                 imageUri = uri
-
-            }
+            },
         )
     }
     return imageUri
 }
 
 val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")
-

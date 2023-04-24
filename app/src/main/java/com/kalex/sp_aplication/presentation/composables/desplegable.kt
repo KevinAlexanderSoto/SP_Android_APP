@@ -4,14 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -22,7 +20,6 @@ import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
-import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -31,10 +28,10 @@ fun Drawer(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     navController: NavController,
-    viewModel : DataViewModel = hiltViewModel(),
+    viewModel: DataViewModel = hiltViewModel(),
 
 ) {
-    //obtener nombre , para que se vuelva a pintar
+    // obtener nombre , para que se vuelva a pintar
     viewModel.settingsPrefs
 
     var nombre = viewModel.nombre
@@ -46,23 +43,24 @@ fun Drawer(
             modifier = Modifier
                 .height(160.dp)
                 .fillMaxWidth(),
-            contentScale = ContentScale.FillWidth
+            contentScale = ContentScale.FillWidth,
         )
 
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(15.dp))
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(15.dp),
+        )
 
-            DrawerItem(texto = "Menú principal", R.drawable.home_24) {
-                navController.navigate("home/$nombre") {
-                    launchSingleTop = true
-                }
-                scope.launch {
-                    scaffoldState.drawerState.close()
-                }
+        DrawerItem(texto = "Menú principal", R.drawable.home_24) {
+            navController.navigate("home/$nombre") {
+                launchSingleTop = true
             }
-        DrawerItem(texto = "Enviar Documentos",R.drawable.upload_file_24) {
-
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
+        }
+        DrawerItem(texto = "Enviar Documentos", R.drawable.upload_file_24) {
             navController.navigate(Constants.SendDocNavItem) {
                 launchSingleTop = true
             }
@@ -80,8 +78,7 @@ fun Drawer(
                 scaffoldState.drawerState.close()
             }
         }
-        DrawerItem(texto = "Oficinas",R.drawable.location_on_24) {
-
+        DrawerItem(texto = "Oficinas", R.drawable.location_on_24) {
             navController.navigate(Constants.oficesNavItem) {
                 launchSingleTop = true
             }
@@ -90,7 +87,7 @@ fun Drawer(
                 scaffoldState.drawerState.close()
             }
         }
-        DrawerItem(texto = "Cerrar sección",R.drawable.logout_20) {
+        DrawerItem(texto = "Cerrar sección", R.drawable.logout_20) {
             navController.navigate(Constants.MainNavItem) {
                 launchSingleTop = true
             }
@@ -104,9 +101,9 @@ fun Drawer(
 
 @Composable
 fun DrawerItem(
-    texto:String,
-    imagen :Any,
-    onItemClick: ()->Unit,
+    texto: String,
+    imagen: Any,
+    onItemClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -115,12 +112,12 @@ fun DrawerItem(
             .padding(6.dp)
             .clip(RoundedCornerShape(12))
             .clickable { onItemClick() },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icono(imagen, 20)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text= texto,
+            text = texto,
             style = TextStyle(fontSize = 18.sp),
 
         )

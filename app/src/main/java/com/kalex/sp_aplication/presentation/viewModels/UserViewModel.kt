@@ -2,7 +2,6 @@ package com.kalex.sp_aplication.presentation.viewModels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
@@ -20,30 +19,29 @@ class UserViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val settingsDataStore: SettingsDataStore,
 
-):ViewModel(){
+) : ViewModel() {
 
     private val _state = mutableStateOf(UserState())
     val state: State<UserState> = _state
-    //Emailvalidation   MutableState<String>
-     fun getUser(email:String , contraseña:String ) {
 
-        var realcontraseña:String
+    // Emailvalidation   MutableState<String>
+    fun getUser(email: String, contraseña: String) {
+        var realcontraseña: String
         // po si el usuario no coloca contraseña
-        if (contraseña ==""){
-             realcontraseña = "no"
-        }else{
-             realcontraseña = contraseña
+        if (contraseña == "") {
+            realcontraseña = "no"
+        } else {
+            realcontraseña = contraseña
         }
         println("ESTA EN GET DEL FORMULARIO")
         getUserUseCase(email, realcontraseña).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-
                     _state.value = UserState(user = result.data)
                 }
                 is Resource.Error -> {
                     _state.value = UserState(
-                        error = result.message ?: "An unexpected error occured"
+                        error = result.message ?: "An unexpected error occured",
                     )
                 }
                 is Resource.Loading -> {
@@ -53,19 +51,17 @@ class UserViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-
-    //para guardar en preferences
-    fun saveAll(nombre: String,correo: String,contraseña: String){
+    // para guardar en preferences
+    fun saveAll(nombre: String, correo: String, contraseña: String) {
         viewModelScope.launch {
-            settingsDataStore.saveAll(nombre,correo,contraseña)
+            settingsDataStore.saveAll(nombre, correo, contraseña)
         }
     }
 
-    //para guardar en preferences
-    fun saveLogin(correo: String,contraseña: String){
+    // para guardar en preferences
+    fun saveLogin(correo: String, contraseña: String) {
         viewModelScope.launch {
-            settingsDataStore.saveLogin(correo,contraseña)
+            settingsDataStore.saveLogin(correo, contraseña)
         }
     }
-
 }

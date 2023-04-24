@@ -10,18 +10,17 @@ import java.io.IOException
 import javax.inject.Inject
 
 class GetDocumentsUseCase @Inject constructor(
-    private val repository: UserRepository // injectamos la interface
-){
-    operator fun invoke(correo :String) : Flow<Resource<DocumentDetailDto>> = flow{
+    private val repository: UserRepository, // injectamos la interface
+) {
+    operator fun invoke(correo: String): Flow<Resource<DocumentDetailDto>> = flow {
         try {
             emit(Resource.Loading<DocumentDetailDto>())
 
-                var document =  repository.getDocuments(correo)
-                emit(Resource.Success<DocumentDetailDto>(document))
-
-        }catch (e: HttpException){
+            var document = repository.getDocuments(correo)
+            emit(Resource.Success<DocumentDetailDto>(document))
+        } catch (e: HttpException) {
             emit(Resource.Error<DocumentDetailDto>(e.localizedMessage ?: "an unexpeted error occured"))
-        }catch (e: IOException){ // no puede comunicarse sin internet por ejemplo
+        } catch (e: IOException) { // no puede comunicarse sin internet por ejemplo
             emit(Resource.Error<DocumentDetailDto>("error internet connection"))
         }
     }

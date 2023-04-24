@@ -10,17 +10,17 @@ import java.io.IOException
 import javax.inject.Inject
 
 class GetUserUseCase @Inject constructor(
-    private val repository: UserRepository // injectamos la interface
-){
-    operator fun invoke(idUsuario: String, clave: String) : Flow<Resource<Userdto>> = flow{
+    private val repository: UserRepository, // injectamos la interface
+) {
+    operator fun invoke(idUsuario: String, clave: String): Flow<Resource<Userdto>> = flow {
         try {
             emit(Resource.Loading<Userdto>())
-            val user = repository.getUser(idUsuario,clave)
+            val user = repository.getUser(idUsuario, clave)
             emit(Resource.Success<Userdto>(user))
-        }catch (e: HttpException){
-                emit(Resource.Error<Userdto>(e.localizedMessage ?: "an unexpeted error occured"))
-        }catch (e: IOException){ // no puede comunicarse sin internet por ejemplo
-        emit(Resource.Error<Userdto>("error internet connection"))
+        } catch (e: HttpException) {
+            emit(Resource.Error<Userdto>(e.localizedMessage ?: "an unexpeted error occured"))
+        } catch (e: IOException) { // no puede comunicarse sin internet por ejemplo
+            emit(Resource.Error<Userdto>("error internet connection"))
         }
     }
 }

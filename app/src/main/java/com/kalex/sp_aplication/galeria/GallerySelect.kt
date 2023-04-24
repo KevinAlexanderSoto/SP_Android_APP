@@ -23,12 +23,11 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.camara.Permission
 import com.kalex.sp_aplication.presentation.ui.EMPTY_IMAGE_URI
 
-
 @ExperimentalPermissionsApi
 @Composable
 fun GallerySelect(
     modifier: Modifier = Modifier,
-    onImageUri: (Uri) -> Unit = { }
+    onImageUri: (Uri) -> Unit = { },
 ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -36,55 +35,54 @@ fun GallerySelect(
         onResult = { uri: Uri? ->
             println("uri de la galeria $uri")
             onImageUri(uri ?: EMPTY_IMAGE_URI)
-        }
+        },
     )
 
-
-@Composable
-fun LaunchGallery() {
-    SideEffect {
-        launcher.launch("image/*")
+    @Composable
+    fun LaunchGallery() {
+        SideEffect {
+            launcher.launch("image/*")
+        }
     }
-}
 
     // pedir permiso si la version de android es mayor a 10
-if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-    Permission(
-        permission = Manifest.permission.ACCESS_MEDIA_LOCATION,
-        rationale = "Si quieres seleccionar una foto , debo acceder a la galeria",
-        permissionNotAvailableContent = {
-            Column(modifier) {
-                Text("O noes! No puedo acceder a tu Galeria")
-                Spacer(modifier = Modifier.height(9.dp))
-                Row {
-                    Button(
-                        modifier = Modifier.padding(4.dp),
-                        onClick = {
-                            context.startActivity(
-                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
-                                }
-                            )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        Permission(
+            permission = Manifest.permission.ACCESS_MEDIA_LOCATION,
+            rationale = "Si quieres seleccionar una foto , debo acceder a la galeria",
+            permissionNotAvailableContent = {
+                Column(modifier) {
+                    Text("O noes! No puedo acceder a tu Galeria")
+                    Spacer(modifier = Modifier.height(9.dp))
+                    Row {
+                        Button(
+                            modifier = Modifier.padding(4.dp),
+                            onClick = {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    },
+                                )
+                            },
+                        ) {
+                            Text("Abrir Configuración")
                         }
-                    ) {
-                        Text("Abrir Configuración")
-                    }
-                    // If they don't want to grant permissions, this button will result in going back
-                    Button(
-                        modifier = Modifier.padding(4.dp),
-                        onClick = {
-                            onImageUri(EMPTY_IMAGE_URI)
+                        // If they don't want to grant permissions, this button will result in going back
+                        Button(
+                            modifier = Modifier.padding(4.dp),
+                            onClick = {
+                                onImageUri(EMPTY_IMAGE_URI)
+                            },
+                        ) {
+                            Text("Usar la camara")
                         }
-                    ) {
-                        Text("Usar la camara")
                     }
                 }
-            }
-        },
-    ) {
+            },
+        ) {
+            LaunchGallery()
+        }
+    } else {
         LaunchGallery()
     }
-} else {
-    LaunchGallery()
-}
 }

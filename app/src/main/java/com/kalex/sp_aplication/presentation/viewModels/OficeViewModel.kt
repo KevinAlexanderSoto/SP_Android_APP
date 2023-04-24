@@ -17,12 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class OficeViewModel @Inject constructor(
     private val getOficeUseCase: GetOficeUseCase,
-    savedStateHandle: SavedStateHandle
-): ViewModel(){
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
 
     private val _state = mutableStateOf(OficeState())
     val state: State<OficeState> = _state
-    val userLocation : LatLng? = null
+    val userLocation: LatLng? = null
     init {
         getOfice("Medellín")
         savedStateHandle.get<String>("ciudad")?.let { ciudad ->
@@ -30,7 +30,7 @@ class OficeViewModel @Inject constructor(
         }
     }
 
-    private fun getOfice(ciudad:String) {
+    private fun getOfice(ciudad: String) {
         getOficeUseCase(ciudad).onEach { result ->
             when (result) {
                 is Resource.Success -> {
@@ -38,7 +38,7 @@ class OficeViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _state.value = OficeState(
-                        error = result.message ?: "An unexpected error occured"
+                        error = result.message ?: "An unexpected error occured",
                     )
                 }
                 is Resource.Loading -> {
