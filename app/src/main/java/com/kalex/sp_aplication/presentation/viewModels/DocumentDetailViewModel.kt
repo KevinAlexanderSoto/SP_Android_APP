@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.domain.use_case.get_documentDetail.GetDocumentDetailUseCase
-import com.kalex.sp_aplication.presentation.states.DocumentDetailState
+import com.kalex.sp_aplication.presentation.validations.states.DocumentDetailState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

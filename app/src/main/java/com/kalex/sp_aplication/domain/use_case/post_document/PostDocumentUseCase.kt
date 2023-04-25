@@ -17,7 +17,7 @@ class PostDocumentUseCase @Inject constructor(
         try {
             emit(Resource.Loading<postDocumentDto>())
 
-            var respuesta = repository.postDocument(body)
+            val respuesta = repository.postDocument(body)
 
             emit(Resource.Success<postDocumentDto>(respuesta))
         } catch (e: HttpException) {

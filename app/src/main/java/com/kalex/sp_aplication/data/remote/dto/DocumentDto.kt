@@ -10,7 +10,7 @@ data class DocumentDto(
 
 fun DocumentDto.toDocument(): Document {
     return Document(
-        Items =  Items.map { it.toItem() },
+        Items = Items.map { it.toItem() },
 
     )
 }

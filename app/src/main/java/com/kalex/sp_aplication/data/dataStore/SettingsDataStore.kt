@@ -16,7 +16,6 @@ const val SETTING_PREFERENCES_NAME: String = "settings_preferences"
 
 @Singleton
 class SettingsDataStore @Inject constructor(
-
     private val context: SpApplication,
 ) {
 
@@ -33,13 +32,13 @@ class SettingsDataStore @Inject constructor(
             }
         }
         .map { preferences ->
-            val nombre = preferences[NOMBRE] ?: ""
-            val correo = preferences[CORREO] ?: ""
-            val contraseña = preferences[CONTRASEÑA] ?: ""
+            val name = preferences[NOMBRE] ?: ""
+            val email = preferences[CORREO] ?: ""
+            val password = preferences[CONTRASEÑA] ?: ""
             DataNeed(
-                nombre = nombre,
-                correo = correo,
-                contraseña = contraseña,
+                nombre = name,
+                correo = email,
+                contraseña = password,
             )
         }
 

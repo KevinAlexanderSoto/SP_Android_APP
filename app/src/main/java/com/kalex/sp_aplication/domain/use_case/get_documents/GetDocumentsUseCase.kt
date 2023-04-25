@@ -16,7 +16,7 @@ class GetDocumentsUseCase @Inject constructor(
         try {
             emit(Resource.Loading<DocumentDetailDto>())
 
-            var document = repository.getDocuments(correo)
+            val document = repository.getDocuments(correo)
             emit(Resource.Success<DocumentDetailDto>(document))
         } catch (e: HttpException) {
             emit(Resource.Error<DocumentDetailDto>(e.localizedMessage ?: "an unexpeted error occured"))

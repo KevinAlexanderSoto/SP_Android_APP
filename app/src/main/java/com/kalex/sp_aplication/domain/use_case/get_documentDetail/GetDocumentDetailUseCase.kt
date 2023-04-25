@@ -16,7 +16,7 @@ class GetDocumentDetailUseCase @Inject constructor(
         try {
             emit(Resource.Loading<DocumentDto>())
 
-            var document = repository.getDocumentDetail(idRegistro)
+            val document = repository.getDocumentDetail(idRegistro)
 
             emit(Resource.Success<DocumentDto>(document))
         } catch (e: HttpException) {

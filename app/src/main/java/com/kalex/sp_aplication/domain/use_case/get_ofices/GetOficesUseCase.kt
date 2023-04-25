@@ -16,7 +16,7 @@ class GetOficesUseCase @Inject constructor(
     operator fun invoke(): Flow<Resource<Ofice>> = flow {
         try {
             emit(Resource.Loading<Ofice>())
-            var ofices = repository.getAllOfices().toOfice()
+            val ofices = repository.getAllOfices().toOfice()
 
             emit(Resource.Success<Ofice>(ofices))
         } catch (e: HttpException) {

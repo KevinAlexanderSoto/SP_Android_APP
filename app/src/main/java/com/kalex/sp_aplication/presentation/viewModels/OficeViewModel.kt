@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.maps.model.LatLng
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOficeUseCase
-import com.kalex.sp_aplication.presentation.states.OficeState
+import com.kalex.sp_aplication.presentation.validations.states.OficeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

@@ -1,4 +1,4 @@
-package com.kalex.sp_aplication.presentation.states
+package com.kalex.sp_aplication.presentation.validations.states
 
 import com.kalex.sp_aplication.data.remote.dto.Userdto
 

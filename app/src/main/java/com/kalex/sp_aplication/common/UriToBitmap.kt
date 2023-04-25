@@ -24,7 +24,7 @@ fun getCapturedImage(selectedPhotoUri: Uri): Bitmap? {
     return bitMin
 }
 
-fun getGaleryImage(selectedPhotoUri: Uri, context: Context): Bitmap? {
+fun getGalleryImage(selectedPhotoUri: Uri, context: Context): Bitmap? {
     var bitMin: Bitmap? = null
     var bitmap: Bitmap? = null
     if (Build.VERSION.SDK_INT >= 29) {

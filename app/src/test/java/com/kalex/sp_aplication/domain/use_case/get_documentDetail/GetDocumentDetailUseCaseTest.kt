@@ -5,7 +5,7 @@ import com.kalex.sp_aplication.data.remote.dto.DocumentDto
 import com.kalex.sp_aplication.data.remote.dto.ItemDto
 import com.kalex.sp_aplication.domain.repository.UserRepository
 import com.kalex.sp_aplication.domain.use_case.post_document.PostDocumentUseCase
-import com.kalex.sp_aplication.presentation.states.DocumentDetailState
+import com.kalex.sp_aplication.presentation.validations.states.DocumentDetailState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

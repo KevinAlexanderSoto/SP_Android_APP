@@ -38,7 +38,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.camara.CameraCapture
 import com.kalex.sp_aplication.common.getCapturedImage
-import com.kalex.sp_aplication.common.getGaleryImage
+import com.kalex.sp_aplication.common.getGalleryImage
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Drawer
 import com.kalex.sp_aplication.presentation.composables.Icono
@@ -243,7 +243,7 @@ fun FormularioDoc(
             )
 
             if (UriImg != EMPTY_IMAGE_URI) {
-                imgBitmap = getGaleryImage(UriImg, context)
+                imgBitmap = getGalleryImage(UriImg, context)
             }
         }
 
