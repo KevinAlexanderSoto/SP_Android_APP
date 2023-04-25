@@ -1,6 +1,8 @@
 package com.kalex.sp_aplication.presentation.ui
 
-/*import android.widget.Toast
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -27,45 +29,48 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
+import com.kalex.sp_aplication.authentication.FingerPrintAuthentication
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Icono
 import com.kalex.sp_aplication.presentation.composables.Imagen
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
 import com.kalex.sp_aplication.presentation.validations.Emailvalidation
-import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
+import com.kalex.sp_aplication.presentation.viewModels.AuthenticationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.File*/
 
-
-/*
-@Composable fun SingIn(
+@RequiresApi(Build.VERSION_CODES.Q)
+@Composable
+fun SingIn(
     navController: NavController,
-    viewModel : UserViewModel = hiltViewModel(),
-    onfiger: () -> Unit
-){
+) {
+    val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
+
+    val fingerPrintAuthentication: FingerPrintAuthentication = hiltViewModel()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),// para hacer scroll
+            .verticalScroll(rememberScrollState()), // para hacer scroll
         verticalArrangement = Arrangement.spacedBy(11.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        Imagen(url = R.drawable.logo_sophos_home, modifier = Modifier
-            .height(210.dp)
-            .width(350.dp)
-            .padding(15.dp) )
+        Imagen(
+            url = R.drawable.logo_sophos_home,
+            modifier = Modifier
+                .height(210.dp)
+                .width(350.dp)
+                .padding(15.dp),
+        )
 
         Textfield("Ingresa tus datos para acceder")
 
         // manejar focus de los texto,
         val localFocusManager = LocalFocusManager.current
 
-        //state hoisting Email
+        // state hoisting Email
         val text = remember { Emailvalidation() }
 
         EmailField(
@@ -74,36 +79,34 @@ import java.io.File*/
             onAction = {
                 // bajar al siguiente field
                 localFocusManager.moveFocus(FocusDirection.Down)
-            }
-        ){
-
+            },
+        ) {
             text.correo = it
             text.validate()
         }
 
-        //state hoisting Password
+        // state hoisting Password
         var password = remember { mutableStateOf("") }
-        PasswordFiels(password.value, onAction ={ localFocusManager.clearFocus()})
-        { password.value = it
+        PasswordFiels(password.value, onAction = { localFocusManager.clearFocus() }) {
+            password.value = it
         }
 
-        viewModel.getUser(text.correo,password.value)
-        //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
+        authenticationViewModel.getUser(text.correo, password.value)
+        // var resp = viewModel.state.value
+        Buttonin(habilitado = text.valid(), authenticationViewModel, navController, text.correo, password.value)
 
-        ButtonHuella(text.valid()){
-            onfiger()
-        }//,onfinger
+        ButtonHuella(text.valid()) {
+            fingerPrintAuthentication.launchBiometric()
+        } // ,onfinger
     }
-
-
 }
 
 @Composable
-fun Textfield(texto: String ) {
-    Text(text = texto,
+fun Textfield(texto: String) {
+    Text(
+        text = texto,
         style = MaterialTheme.typography.h6,
-        color = colors.secondary
+        color = colors.secondary,
     )
 }
 
@@ -112,38 +115,36 @@ fun EmailField(
     text: String,
     error: String?,
     onAction: () -> Unit,
-    onEmailChanged: (String) -> Unit
+    onEmailChanged: (String) -> Unit,
 ) {
-
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-
-    TextField(
-        value = text,
-        singleLine = true,
-        onValueChange = { onEmailChanged(it)},
-        label = { Text(text = "Email") },
-        placeholder = { Text("example@gmail.com") },
-        modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth(0.9f),
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            textColor = colors.secondary
-        ),
-        shape = RoundedCornerShape(9.dp),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
-            ) ,
-        keyboardActions = KeyboardActions (onNext = {
-            onAction()
-        }),
-        isError = error != null
-    )
-        error?.let{ FielError(it) }
+        TextField(
+            value = text,
+            singleLine = true,
+            onValueChange = { onEmailChanged(it) },
+            label = { Text(text = "Email") },
+            placeholder = { Text("example@gmail.com") },
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth(0.9f),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                textColor = colors.secondary,
+            ),
+            shape = RoundedCornerShape(9.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                onAction()
+            }),
+            isError = error != null,
+        )
+        error?.let { FielError(it) }
     }
 }
 
@@ -151,7 +152,7 @@ fun EmailField(
 fun FielError(it: String) {
     Text(
         text = it,
-        style = TextStyle(color =colors.error)
+        style = TextStyle(color = colors.error),
     )
 }
 
@@ -159,27 +160,27 @@ fun FielError(it: String) {
 fun PasswordFiels(
     pass: String,
     onAction: () -> Unit,
-    onPasswordChange: (String) -> Unit
+    onPasswordChange: (String) -> Unit,
 ) {
     TextField(
         value = pass,
         onValueChange = { onPasswordChange(it) },
-        label = { Text("Contraseña" ) },
+        label = { Text("Contraseña") },
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth(0.9f),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            textColor = colors.secondary
+            textColor = colors.secondary,
         ),
         shape = RoundedCornerShape(9.dp),
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ) ,
-        keyboardActions = KeyboardActions (onDone = {
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(onDone = {
             onAction()
         }),
 
@@ -189,10 +190,10 @@ fun PasswordFiels(
 @Composable
 fun Buttonin(
     habilitado: Boolean,
-    viewModel: UserViewModel,
+    viewModel: AuthenticationViewModel,
     navController: NavController,
     correo: String,
-    contraseña :String
+    contraseña: String,
 ) {
     val context = LocalContext.current
     Button(
@@ -205,52 +206,41 @@ fun Buttonin(
 
             var resp = viewModel.state.value
 
-               //println("Respuesta de server: $resp")
-                resp.user?.let {user ->
-                    val acceso = user.acceso
-                    println("acceso $acceso")
-                    // println("respuesta${resp.user}")
-                    if (acceso == true){
-
-                        Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
-                        viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
-                        navController.navigate("home/${resp.user?.nombre}")
-
-                    }else if(acceso == false){
-                        Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
-
-                    }
-
+            // println("Respuesta de server: $resp")
+            resp.user?.let { user ->
+                val acceso = user.acceso
+                println("acceso $acceso")
+                // println("respuesta${resp.user}")
+                if (acceso == true) {
+                    Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
+                    viewModel.saveAll(nombre = user.nombre, correo = correo, contraseña = contraseña)
+                    navController.navigate("home/${resp.user?.nombre}")
+                } else if (acceso == false) {
+                    Toast.makeText(context, "El Correo o la Contraseña son incorrectos", Toast.LENGTH_LONG).show()
                 }
-
-
-
-                  },
+            }
+        },
         modifier = Modifier
             .padding(top = 30.dp)
-            .fillMaxWidth(0.8f)
-        ,
+            .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(23.dp),
         contentPadding = PaddingValues(12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = spcolor,
-            contentColor = blanco
+            contentColor = blanco,
         ),
-        enabled = habilitado
+        enabled = habilitado,
     ) {
-
-        Icono(R.drawable.outline_login_24,30)
+        Icono(R.drawable.outline_login_24, 30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar",22)
-
+        ButtonText("Ingresar", 22)
     }
-    //if(resp.isLoading) CircularProgressIndicator()
+    // if(resp.isLoading) CircularProgressIndicator()
 }
 
-
 @Composable
-fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
+fun ButtonHuella(habilitado: Boolean, onfiger: () -> Unit) { // ,
     OutlinedButton(
         onClick = { onfiger() },
         modifier = Modifier
@@ -259,10 +249,10 @@ fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        //enabled = habilitado
+        // enabled = habilitado
     ) {
-        Icono(R.drawable.baseline_fingerprint_24,35)
+        Icono(R.drawable.baseline_fingerprint_24, 35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar con huella",22)
+        ButtonText("Ingresar con huella", 22)
     }
-}*/
+}

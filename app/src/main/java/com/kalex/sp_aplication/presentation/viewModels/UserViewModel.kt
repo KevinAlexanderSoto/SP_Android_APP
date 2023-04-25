@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(
+class AuthenticationViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val settingsDataStore: SettingsDataStore,
 
@@ -33,7 +33,6 @@ class UserViewModel @Inject constructor(
         } else {
             realcontraseña = contraseña
         }
-        println("ESTA EN GET DEL FORMULARIO")
         getUserUseCase(email, realcontraseña).onEach { result ->
             when (result) {
                 is Resource.Success -> {
