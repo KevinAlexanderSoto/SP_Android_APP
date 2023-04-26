@@ -1,7 +1,6 @@
 package com.kalex.sp_aplication.presentation.ui
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -13,8 +12,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -36,20 +37,21 @@ import com.kalex.sp_aplication.presentation.composables.Imagen
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
 import com.kalex.sp_aplication.presentation.validations.Emailvalidation
+import com.kalex.sp_aplication.presentation.validations.states.UserState
 import com.kalex.sp_aplication.presentation.viewModels.AuthenticationViewModel
-import kotlinx.coroutines.delay
+import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun SingIn(
     navController: NavController,
 ) {
+    val context = LocalContext.current
     val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
-
+    val storedDataViewModel: DataViewModel = hiltViewModel()
     val fingerPrintAuthentication: FingerPrintAuthentication = hiltViewModel()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,20 +88,61 @@ fun SingIn(
         }
 
         // state hoisting Password
-        var password = remember { mutableStateOf("") }
-        PasswordFiels(password.value, onAction = { localFocusManager.clearFocus() }) {
+        val password = remember { mutableStateOf("") }
+        PasswordFiels(
+            password.value,
+            onAction = { localFocusManager.clearFocus() },
+        ) {
             password.value = it
         }
-
-        authenticationViewModel.getUser(text.correo, password.value)
-        // var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(), authenticationViewModel, navController, text.correo, password.value)
-
-        ButtonHuella(text.valid()) {
+        Buttonin(
+            habilitado = text.valid(),
+        ) {
+            authenticationViewModel.getUser(text.correo, password.value)
+            handleAuthenticationState(authenticationViewModel.state.value) {
+                storedDataViewModel.saveAll(it, text.correo, password.value)
+                navController.navigate("home/$it")
+            }
+            // TODO: Take a look to the access in the user model response
+        }
+        val coroutineScope = rememberCoroutineScope()
+        ButtonHuella(
+            checkStoredCredentials(
+                storedDataViewModel.email,
+                storedDataViewModel.password,
+            ),
+        ) {
             fingerPrintAuthentication.launchBiometric()
-        } // ,onfinger
+            coroutineScope.launch {
+                fingerPrintAuthentication.authenticationResult.collectLatest {
+                    if (it) {
+                        authenticationViewModel.getUser(
+                            storedDataViewModel.email.value,
+                            storedDataViewModel.password.value,
+                        )
+                        if (!authenticationViewModel.state.value.isLoading) {
+                            val currentUserName =
+                                authenticationViewModel.state.value.user?.nombre ?: ""
+                            storedDataViewModel.saveUserName(currentUserName)
+                            navController.navigate("home/$currentUserName")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
+fun handleAuthenticationState(value: UserState, onSuccessState: (String) -> Unit) {
+    if (value.isLoading) {
+        // TODO: Add loading indicator
+    } else {
+        onSuccessState(value.user?.nombre ?: "")
+    }
+}
+
+fun checkStoredCredentials(email: State<String>, password: State<String>) =
+    email.value.isNotEmpty() && password.value.isNotEmpty()
 
 @Composable
 fun Textfield(texto: String) {
@@ -190,35 +233,11 @@ fun PasswordFiels(
 @Composable
 fun Buttonin(
     habilitado: Boolean,
-    viewModel: AuthenticationViewModel,
-    navController: NavController,
-    correo: String,
-    contraseña: String,
+    onClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     Button(
         onClick = {
-            runBlocking {
-                launch {
-                    delay(100L)
-                }
-            }
-
-            var resp = viewModel.state.value
-
-            // println("Respuesta de server: $resp")
-            resp.user?.let { user ->
-                val acceso = user.acceso
-                println("acceso $acceso")
-                // println("respuesta${resp.user}")
-                if (acceso == true) {
-                    Toast.makeText(context, "Acceso concedido", Toast.LENGTH_LONG).show()
-                    viewModel.saveAll(nombre = user.nombre, correo = correo, contraseña = contraseña)
-                    navController.navigate("home/${resp.user?.nombre}")
-                } else if (acceso == false) {
-                    Toast.makeText(context, "El Correo o la Contraseña son incorrectos", Toast.LENGTH_LONG).show()
-                }
-            }
+            onClick.invoke()
         },
         modifier = Modifier
             .padding(top = 30.dp)
@@ -240,7 +259,7 @@ fun Buttonin(
 }
 
 @Composable
-fun ButtonHuella(habilitado: Boolean, onfiger: () -> Unit) { // ,
+fun ButtonHuella(habilitate: Boolean, onfiger: () -> Unit) { // ,
     OutlinedButton(
         onClick = { onfiger() },
         modifier = Modifier
@@ -249,7 +268,7 @@ fun ButtonHuella(habilitado: Boolean, onfiger: () -> Unit) { // ,
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        // enabled = habilitado
+        enabled = habilitate,
     ) {
         Icono(R.drawable.baseline_fingerprint_24, 35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))

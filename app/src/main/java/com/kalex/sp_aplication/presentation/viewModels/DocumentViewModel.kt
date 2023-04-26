@@ -25,7 +25,7 @@ class DocumentViewModel @Inject constructor(
     var dato: String = ""
     init {
         settingsDataStore.settingsPrefsFlow.onEach { result ->
-            dato = result.correo
+            dato = result.EMAIL
         }.launchIn(viewModelScope)
         println("Correo Guardado :  $dato")
        /*println("keys guardadas"+savedStateHandle.keys())

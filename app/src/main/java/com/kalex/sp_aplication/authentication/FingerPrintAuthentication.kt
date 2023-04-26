@@ -10,12 +10,12 @@ import android.os.Build
 import android.os.CancellationSignal
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import com.kalex.sp_aplication.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,8 +24,9 @@ class FingerPrintAuthentication @Inject constructor(
 ) : ViewModel() {
 
     private var cancellationSignal: CancellationSignal? = null
-    private val _authenticationResult = mutableStateOf(false)
-    val authenticationResult: State<Boolean> = _authenticationResult
+
+    private val _authenticationResult = MutableStateFlow(false)
+    val authenticationResult: StateFlow<Boolean> = _authenticationResult
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun launchBiometric() {

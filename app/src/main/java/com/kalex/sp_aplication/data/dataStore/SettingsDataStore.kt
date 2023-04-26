@@ -32,45 +32,45 @@ class SettingsDataStore @Inject constructor(
             }
         }
         .map { preferences ->
-            val name = preferences[NOMBRE] ?: ""
-            val email = preferences[CORREO] ?: ""
-            val password = preferences[CONTRASEÑA] ?: ""
+            val name = preferences[NAME] ?: ""
+            val email = preferences[EMAIL] ?: ""
+            val password = preferences[PASSWORD] ?: ""
             DataNeed(
-                nombre = name,
-                correo = email,
-                contraseña = password,
+                NAME = name,
+                EMAIL = email,
+                PASSWORD = password,
             )
         }
 
-    suspend fun saveNombre(nuevo: String) {
+    suspend fun saveName(nuevo: String) {
         context.dataStore.edit { preferences ->
-            preferences[NOMBRE] = nuevo
+            preferences[NAME] = nuevo
         }
     }
-    suspend fun saveAll(nombre: String, correo: String, contraseña: String) {
+    suspend fun saveAll(nombre: String, correo: String, password: String) {
         context.dataStore.edit { preferences ->
-            preferences[NOMBRE] = nombre
-            preferences[CORREO] = correo
-            preferences[CONTRASEÑA] = contraseña
+            preferences[NAME] = nombre
+            preferences[EMAIL] = correo
+            preferences[PASSWORD] = password
         }
     }
 
-    suspend fun saveLogin(correo: String, contraseña: String) {
+    suspend fun saveLogin(email: String, password: String) {
         context.dataStore.edit { preferences ->
-            preferences[CORREO] = correo
-            preferences[CONTRASEÑA] = contraseña
+            preferences[EMAIL] = email
+            preferences[PASSWORD] = password
         }
     }
 
     companion object {
-        val NOMBRE = stringPreferencesKey("nombre")
-        val CORREO = stringPreferencesKey("correo")
-        val CONTRASEÑA = stringPreferencesKey("contraseña")
+        val NAME = stringPreferencesKey("NAME")
+        val EMAIL = stringPreferencesKey("EMAIL")
+        val PASSWORD = stringPreferencesKey("PASSWORD")
     }
 
     data class DataNeed(
-        val nombre: String,
-        val correo: String,
-        val contraseña: String,
+        val NAME: String,
+        val EMAIL: String,
+        val PASSWORD: String,
     )
 }

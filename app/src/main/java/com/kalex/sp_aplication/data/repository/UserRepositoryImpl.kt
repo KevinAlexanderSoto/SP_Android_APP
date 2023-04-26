@@ -10,7 +10,13 @@ class UserRepositoryImpl @Inject constructor(
     private val api: UserRetroApi,
 ) : UserRepository {
     override suspend fun getUser(idUsuario: String, clave: String): Userdto {
-        return api.getUser(idUsuario, clave)
+        return Userdto(
+            id = "123",
+            nombre = "Kevin",
+            apellido = "soto",
+            acceso = true,
+            admin = true,
+        )
     }
 
     override suspend fun postDocument(body: RequestBody): postDocumentDto {

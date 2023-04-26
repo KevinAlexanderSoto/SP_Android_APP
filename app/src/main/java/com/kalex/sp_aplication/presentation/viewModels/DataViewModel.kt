@@ -1,5 +1,7 @@
 package com.kalex.sp_aplication.presentation.viewModels
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
@@ -14,19 +16,35 @@ class DataViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
-    var nombre: String = ""
-    var correo: String = ""
-    var constraseña: String = ""
+    private val _name = mutableStateOf("")
+    val name: State<String> = _name
 
-    val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
-        nombre = result.nombre
-        correo = result.correo
-        constraseña = result.contraseña
-    }.launchIn(viewModelScope)
+    private val _email = mutableStateOf("")
+    val email: State<String> = _email
 
-    fun saveAll(nombre: String, correo: String, contraseña: String) {
+    private val _password = mutableStateOf("")
+    val password: State<String> = _password
+
+    init {
+        settingsDataStore.settingsPrefsFlow.onEach { result ->
+            _name.value = result.NAME
+            _email.value = result.EMAIL
+            _password.value = result.PASSWORD
+        }.launchIn(viewModelScope)
+    }
+    fun saveAll(name: String, email: String, password: String) {
         viewModelScope.launch {
-            settingsDataStore.saveAll(nombre, correo, contraseña)
+            settingsDataStore.saveAll(name, email, password)
+        }
+    }
+    fun saveAuthenticationsCredentials(email: String, password: String) {
+        viewModelScope.launch {
+            settingsDataStore.saveLogin(email, password)
+        }
+    }
+    fun saveUserName(name: String){
+        viewModelScope.launch {
+            settingsDataStore.saveName(name)
         }
     }
 }

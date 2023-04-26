@@ -28,7 +28,7 @@ class OficesViewModel @Inject constructor(
 
     init {
         val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
-            correo = result.correo
+            correo = result.EMAIL
         }.launchIn(viewModelScope)
 
         getOfices()
