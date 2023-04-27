@@ -10,15 +10,15 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class GetOficeUseCase @Inject constructor(
-    private val repository: UserRepository, // injectamos la interface
+class GetOfficeUseCase @Inject constructor(
+    private val repository: UserRepository,
 ) {
-    operator fun invoke(ciudad: String): Flow<Resource<Ofice>> = flow {
+    operator fun invoke(city: String): Flow<Resource<Ofice>> = flow {
         try {
             emit(Resource.Loading<Ofice>())
-            val ofices = repository.getOfices(ciudad).toOfice()
+            val offices = repository.getOfices(city).toOfice()
 
-            emit(Resource.Success<Ofice>(ofices))
+            emit(Resource.Success<Ofice>(offices))
         } catch (e: HttpException) {
             emit(Resource.Error<Ofice>(e.localizedMessage ?: "an unexpeted error occured"))
         } catch (e: IOException) { // no puede comunicarse sin internet por ejemplo

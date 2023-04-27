@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.maps.model.LatLng
 import com.kalex.sp_aplication.common.Resource
-import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOficeUseCase
+import com.kalex.sp_aplication.domain.use_case.get_ofice.GetOfficeUseCase
 import com.kalex.sp_aplication.presentation.validations.states.OficeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class OficeViewModel @Inject constructor(
-    private val getOficeUseCase: GetOficeUseCase,
+class OfficeViewModel @Inject constructor(
+    private val getOfficeUseCase: GetOfficeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -24,14 +24,14 @@ class OficeViewModel @Inject constructor(
     val state: State<OficeState> = _state
     val userLocation: LatLng? = null
     init {
-        getOfice("Medellín")
+        getOffice("Medellín")
         savedStateHandle.get<String>("ciudad")?.let { ciudad ->
-            getOfice(ciudad)
+            getOffice(ciudad)
         }
     }
 
-    private fun getOfice(ciudad: String) {
-        getOficeUseCase(ciudad).onEach { result ->
+    private fun getOffice(ciudad: String) {
+        getOfficeUseCase(ciudad).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = OficeState(ofices = result.data)

@@ -41,15 +41,15 @@ import com.kalex.sp_aplication.common.getCapturedImage
 import com.kalex.sp_aplication.common.getGalleryImage
 import com.kalex.sp_aplication.presentation.composables.ButtonText
 import com.kalex.sp_aplication.presentation.composables.Drawer
-import com.kalex.sp_aplication.presentation.composables.Icono
-import com.kalex.sp_aplication.presentation.composables.Imagen
+import com.kalex.sp_aplication.presentation.composables.Icon
+import com.kalex.sp_aplication.presentation.composables.Image
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
 import com.kalex.sp_aplication.presentation.validations.getFileSizeFloat
-import com.kalex.sp_aplication.presentation.validations.validarString
+import com.kalex.sp_aplication.presentation.validations.validatorString
 import com.kalex.sp_aplication.presentation.viewModels.OficesViewModel
 import com.kalex.sp_aplication.presentation.viewModels.PostDocumentViewModel
-import com.kalex.usodecamara.galeria.GallerySelect
+import com.kalex.sp_aplication.galeria.GallerySelect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -250,7 +250,7 @@ fun FormularioDoc(
 // -------------------validaciones para habilitar enviar data---------------------------
         var validacion: Boolean = false
         if (imgBitmap != null) {
-            validacion = validarString(text1) && validarString(text2) && validarString(text3) && validarString(text4) && validarString(menu1) && validarString(menu2) && validarString(menu3)
+            validacion = validatorString(text1) && validatorString(text2) && validatorString(text3) && validatorString(text4) && validatorString(menu1) && validatorString(menu2) && validatorString(menu3)
         }
 
 // -------------------Armado del body para Post Document---------------------------
@@ -425,7 +425,7 @@ fun BtnEnviarImg(
             println(resp.value)
         }
 
-        Icono(R.drawable.send_24, 25)
+        Icon(R.drawable.send_24, 25)
         Spacer(Modifier.size(4.dp))
         ButtonText("Enviar", 20)
     }
@@ -453,7 +453,7 @@ fun BtncargarImg(
         ),
         enabled = true,
     ) {
-        Icono(icono, 20)
+        Icon(icono, 20)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText(texto, 15)
     }
@@ -477,7 +477,7 @@ fun capturaraImg(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Imagen(
+            Image(
                 imageUri,
                 modifier = Modifier
                     .height(400.dp)
@@ -532,7 +532,7 @@ fun capturaraImgGaleria(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Imagen(
+            Image(
                 imageUri,
                 modifier = Modifier
                     .height(400.dp)

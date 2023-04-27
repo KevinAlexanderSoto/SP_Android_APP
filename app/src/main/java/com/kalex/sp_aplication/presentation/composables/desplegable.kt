@@ -82,7 +82,7 @@ fun Drawer(
             }
         }
         DrawerItem(texto = "Oficinas", R.drawable.location_on_24) {
-            navController.navigate(Constants.oficesNavItem) {
+            navController.navigate(Constants.officesNavItem) {
                 launchSingleTop = true
             }
 
@@ -117,7 +117,7 @@ fun DrawerItem(
             .clickable { onItemClick() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icono(imagen, 20)
+        Icon(imagen, 20)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = texto,

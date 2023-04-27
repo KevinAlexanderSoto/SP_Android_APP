@@ -5,7 +5,7 @@ object Constants {
     const val MainNavItem = "singin"
     const val HomeNavItem = "home/{nombre}"
     const val SendDocNavItem = "senddoc"
-    const val oficesNavItem = "getofices"
+    const val officesNavItem = "getofices"
     const val getDocNavItem = "getdoc"
     const val getDocDetailNavItem = "getdocdetail/{idRegistro}"
 }

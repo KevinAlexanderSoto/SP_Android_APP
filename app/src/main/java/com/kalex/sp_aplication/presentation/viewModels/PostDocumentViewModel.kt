@@ -33,6 +33,7 @@ class PostDocumentViewModel @Inject constructor(
                         error = result.message ?: "An unexpected error occured",
                     )
                 }
+
                 is Resource.Loading -> {
                     _state.value = PostDocumentState(isLoading = true)
                 }

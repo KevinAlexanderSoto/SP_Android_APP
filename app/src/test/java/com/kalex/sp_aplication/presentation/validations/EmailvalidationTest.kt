@@ -7,10 +7,10 @@ import org.junit.Before
 import org.junit.Test
 
 class EmailvalidationTest {
-    private lateinit var emailvalidation:Emailvalidation
+    private lateinit var emailvalidation:EmailValidation
     @Before
     fun setUp() {
-        emailvalidation = Emailvalidation()
+        emailvalidation = EmailValidation()
     }
 
     @Test

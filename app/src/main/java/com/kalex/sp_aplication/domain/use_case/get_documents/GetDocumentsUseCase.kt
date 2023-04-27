@@ -10,13 +10,13 @@ import java.io.IOException
 import javax.inject.Inject
 
 class GetDocumentsUseCase @Inject constructor(
-    private val repository: UserRepository, // injectamos la interface
+    private val repository: UserRepository,
 ) {
-    operator fun invoke(correo: String): Flow<Resource<DocumentDetailDto>> = flow {
+    operator fun invoke(email: String): Flow<Resource<DocumentDetailDto>> = flow {
         try {
             emit(Resource.Loading<DocumentDetailDto>())
 
-            val document = repository.getDocuments(correo)
+            val document = repository.getDocuments(email)
             emit(Resource.Success<DocumentDetailDto>(document))
         } catch (e: HttpException) {
             emit(Resource.Error<DocumentDetailDto>(e.localizedMessage ?: "an unexpeted error occured"))

@@ -42,7 +42,7 @@ class DataViewModel @Inject constructor(
             settingsDataStore.saveLogin(email, password)
         }
     }
-    fun saveUserName(name: String){
+    fun saveUserName(name: String) {
         viewModelScope.launch {
             settingsDataStore.saveName(name)
         }

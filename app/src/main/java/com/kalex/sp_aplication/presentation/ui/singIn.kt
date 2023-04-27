@@ -32,11 +32,11 @@ import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.authentication.FingerPrintAuthentication
 import com.kalex.sp_aplication.presentation.composables.ButtonText
-import com.kalex.sp_aplication.presentation.composables.Icono
-import com.kalex.sp_aplication.presentation.composables.Imagen
+import com.kalex.sp_aplication.presentation.composables.Icon
+import com.kalex.sp_aplication.presentation.composables.Image
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
-import com.kalex.sp_aplication.presentation.validations.Emailvalidation
+import com.kalex.sp_aplication.presentation.validations.EmailValidation
 import com.kalex.sp_aplication.presentation.validations.states.UserState
 import com.kalex.sp_aplication.presentation.viewModels.AuthenticationViewModel
 import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
@@ -52,6 +52,8 @@ fun SingIn(
     val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
     val storedDataViewModel: DataViewModel = hiltViewModel()
     val fingerPrintAuthentication: FingerPrintAuthentication = hiltViewModel()
+    val localFocusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -59,7 +61,7 @@ fun SingIn(
         verticalArrangement = Arrangement.spacedBy(11.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Imagen(
+        Image(
             url = R.drawable.logo_sophos_home,
             modifier = Modifier
                 .height(210.dp)
@@ -67,21 +69,15 @@ fun SingIn(
                 .padding(15.dp),
         )
 
-        Textfield("Ingresa tus datos para acceder")
-
-        // manejar focus de los texto,
-        val localFocusManager = LocalFocusManager.current
+        TextField("Ingresa tus datos para acceder")
 
         // state hoisting Email
-        val text = remember { Emailvalidation() }
+        val text = remember { EmailValidation() }
 
         EmailField(
             text.correo,
             text.error,
-            onAction = {
-                // bajar al siguiente field
-                localFocusManager.moveFocus(FocusDirection.Down)
-            },
+            onAction = { localFocusManager.moveFocus(FocusDirection.Down) },
         ) {
             text.correo = it
             text.validate()
@@ -89,13 +85,12 @@ fun SingIn(
 
         // state hoisting Password
         val password = remember { mutableStateOf("") }
-        PasswordFiels(
+        PasswordFields(
             password.value,
             onAction = { localFocusManager.clearFocus() },
-        ) {
-            password.value = it
-        }
-        Buttonin(
+        ) { password.value = it }
+
+        ButtonIn(
             habilitado = text.valid(),
         ) {
             authenticationViewModel.getUser(text.correo, password.value)
@@ -106,7 +101,7 @@ fun SingIn(
             // TODO: Take a look to the access in the user model response
         }
         val coroutineScope = rememberCoroutineScope()
-        ButtonHuella(
+        FingerPrintButton(
             checkStoredCredentials(
                 storedDataViewModel.email,
                 storedDataViewModel.password,
@@ -135,7 +130,7 @@ fun SingIn(
 
 fun handleAuthenticationState(value: UserState, onSuccessState: (String) -> Unit) {
     if (value.isLoading) {
-        // TODO: Add loading indicator
+        // CircularProgressIndicator()
     } else {
         onSuccessState(value.user?.nombre ?: "")
     }
@@ -145,7 +140,7 @@ fun checkStoredCredentials(email: State<String>, password: State<String>) =
     email.value.isNotEmpty() && password.value.isNotEmpty()
 
 @Composable
-fun Textfield(texto: String) {
+fun TextField(texto: String) {
     Text(
         text = texto,
         style = MaterialTheme.typography.h6,
@@ -187,12 +182,12 @@ fun EmailField(
             }),
             isError = error != null,
         )
-        error?.let { FielError(it) }
+        error?.let { FieldError(it) }
     }
 }
 
 @Composable
-fun FielError(it: String) {
+fun FieldError(it: String) {
     Text(
         text = it,
         style = TextStyle(color = colors.error),
@@ -200,7 +195,7 @@ fun FielError(it: String) {
 }
 
 @Composable
-fun PasswordFiels(
+fun PasswordFields(
     pass: String,
     onAction: () -> Unit,
     onPasswordChange: (String) -> Unit,
@@ -227,11 +222,11 @@ fun PasswordFiels(
             onAction()
         }),
 
-    )
+        )
 }
 
 @Composable
-fun Buttonin(
+fun ButtonIn(
     habilitado: Boolean,
     onClick: () -> Unit,
 ) {
@@ -251,17 +246,17 @@ fun Buttonin(
         ),
         enabled = habilitado,
     ) {
-        Icono(R.drawable.outline_login_24, 30)
+        Icon(R.drawable.outline_login_24, 30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText("Ingresar", 22)
     }
-    // if(resp.isLoading) CircularProgressIndicator()
+
 }
 
 @Composable
-fun ButtonHuella(habilitate: Boolean, onfiger: () -> Unit) { // ,
+fun FingerPrintButton(habilitate: Boolean, onButtonClick: () -> Unit) { // ,
     OutlinedButton(
-        onClick = { onfiger() },
+        onClick = { onButtonClick() },
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth(0.8f),
@@ -270,7 +265,7 @@ fun ButtonHuella(habilitate: Boolean, onfiger: () -> Unit) { // ,
         shape = RoundedCornerShape(23.dp),
         enabled = habilitate,
     ) {
-        Icono(R.drawable.baseline_fingerprint_24, 35)
+        Icon(R.drawable.baseline_fingerprint_24, 35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText("Ingresar con huella", 22)
     }

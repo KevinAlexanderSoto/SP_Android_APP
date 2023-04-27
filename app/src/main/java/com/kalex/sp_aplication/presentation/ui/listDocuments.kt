@@ -122,11 +122,11 @@ fun ToolBarVerDocs(
                     it
                     item {
                         DocumentListItem(
-                            fecha = it.Fecha,
-                            TipoAdjunto = it.TipoAdjunto,
-                            idregistro = it.IdRegistro,
-                            nombre = it.Nombre,
-                            apellido = it.Apellido,
+                            date = it.Fecha,
+                            documentType = it.TipoAdjunto,
+                            id = it.IdRegistro,
+                            name = it.Nombre,
+                            lastName = it.Apellido,
                             onItemClick = { it ->
                                 val idregistro = it
                                 navController.navigate("getdocdetail/$idregistro")

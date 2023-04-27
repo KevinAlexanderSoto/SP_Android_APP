@@ -42,7 +42,7 @@ fun Navigation() {
             requireNotNull(idRegistro)
             VerDocumento(navController, idRegistro = idRegistro)
         }
-        composable(Constants.oficesNavItem) {
+        composable(Constants.officesNavItem) {
             VerOficinas(navController)
         }
     }

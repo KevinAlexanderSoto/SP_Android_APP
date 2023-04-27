@@ -5,7 +5,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
@@ -83,7 +82,7 @@ fun Contenido(
         verticalArrangement = Arrangement.spacedBy(19.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Imagen(
+        Image(
             url = R.drawable.people2,
             modifier = Modifier
                 .wrapContentSize(Alignment.BottomCenter)
@@ -110,7 +109,7 @@ fun Contenido(
             encabezado = "Oficinas",
             R.drawable.location_on_24,
             navController,
-            Constants.oficesNavItem,
+            Constants.officesNavItem,
             color3,
         )
         Spacer(modifier = Modifier.padding(3.dp))
@@ -138,7 +137,7 @@ fun Card(
                 .fillMaxWidth(),
         ) {
             Row(modifier = Modifier.padding(2.dp, 1.dp, 5.dp, 20.dp)) {
-                Icono(urlIcono, 30)
+                Icon(urlIcono, 30)
                 Spacer(modifier = Modifier.padding(3.dp))
                 Text(text = encabezado, color = colorItem)
             }
@@ -158,7 +157,7 @@ fun Card(
                     ),
                 ) {
                     ButtonText("Ingresar", 15)
-                    IconoVector(Icons.Default.ArrowForward, 20)
+                    IconVector(Icons.Default.ArrowForward, 20)
                 }
             }
         }

@@ -17,9 +17,9 @@ class PostDocumentUseCase @Inject constructor(
         try {
             emit(Resource.Loading<postDocumentDto>())
 
-            val respuesta = repository.postDocument(body)
+            val result = repository.postDocument(body)
 
-            emit(Resource.Success<postDocumentDto>(respuesta))
+            emit(Resource.Success<postDocumentDto>(result))
         } catch (e: HttpException) {
             emit(Resource.Error<postDocumentDto>(e.localizedMessage ?: "an unexpeted error occured"))
         } catch (e: IOException) { // no puede comunicarse sin internet por ejemplo
