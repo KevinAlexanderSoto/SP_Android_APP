@@ -1,4 +1,4 @@
-package com.kalex.usodecamara.galeria
+package com.kalex.sp_aplication.galeria
 
 import android.Manifest
 import android.content.Intent
@@ -33,7 +33,6 @@ fun GallerySelect(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            println("uri de la galeria $uri")
             onImageUri(uri ?: EMPTY_IMAGE_URI)
         },
     )

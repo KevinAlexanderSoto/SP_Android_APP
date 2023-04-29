@@ -17,7 +17,6 @@ import javax.inject.Inject
 class DocumentViewModel @Inject constructor(
     private val getDocumentsUseCase: GetDocumentsUseCase,
     private val settingsDataStore: SettingsDataStore,
-    /*viewmodelData : DataViewModel*/
 ) : ViewModel() {
 
     private val _state = mutableStateOf(DocumentState())
@@ -25,18 +24,13 @@ class DocumentViewModel @Inject constructor(
     var dato: String = ""
     init {
         settingsDataStore.settingsPrefsFlow.onEach { result ->
-            dato = result.correo
+            dato = result.EMAIL
         }.launchIn(viewModelScope)
-        println("Correo Guardado :  $dato")
-       /*println("keys guardadas"+savedStateHandle.keys())
-       savedStateHandle.get<String>("correo")?.let {correo->
-       }*/
         getDocuments(dato)
     }
 
     fun getDocuments(email: String = "no") {
         getDocumentsUseCase(email).onEach { result ->
-
             when (result) {
                 is Resource.Success -> {
                     _state.value = DocumentState(document = result.data)

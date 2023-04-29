@@ -1,5 +1,7 @@
 package com.kalex.sp_aplication.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -7,42 +9,41 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.common.Constants
 import com.kalex.sp_aplication.presentation.ui.*
-import java.io.File
 
-/*TODO ESTO POR LA AUTENTICACION CON HUELLA :V , SE QUEDA ASI HASTA QUE SEPARA COMO MEJORARLO
+@RequiresApi(Build.VERSION_CODES.Q)
 @ExperimentalPermissionsApi
 @Composable
-fun Navegacion(onfiger: () -> Unit) {
+fun Navigation() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Constants.MainNavItem)
-    {
-        composable(Constants.MainNavItem){
-            SingIn(navController){onfiger()}
+        startDestination = Constants.MainNavItem,
+    ) {
+        composable(Constants.MainNavItem) {
+            SingIn(navController)
         }
-        composable(Constants.HomeNavItem
-        ){
-          backStackEntry->
-               val nombre= backStackEntry.arguments?.getString("nombre")
+        composable(
+            Constants.HomeNavItem,
+        ) {
+                backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre")
             requireNotNull(nombre)
-            Home(navController,nombre)
-
+            Home(navController, nombre)
         }
-        composable(Constants.SendDocNavItem){
+        composable(Constants.SendDocNavItem) {
             EnviarDocumento(navController)
         }
-        composable(Constants.getDocNavItem){
+        composable(Constants.getDocNavItem) {
             VerDocumentos(navController)
         }
-        composable(Constants.getDocDetailNavItem){
-                backStackEntry->
-            val idRegistro= backStackEntry.arguments?.getString("idRegistro")
+        composable(Constants.getDocDetailNavItem) {
+                backStackEntry ->
+            val idRegistro = backStackEntry.arguments?.getString("idRegistro")
             requireNotNull(idRegistro)
-            VerDocumento(navController, idRegistro = idRegistro)
+            VerDocumento(navController)
         }
-        composable(Constants.oficesNavItem){
+        composable(Constants.officesNavItem) {
             VerOficinas(navController)
         }
     }
-}*/
+}

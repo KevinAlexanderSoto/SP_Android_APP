@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 
 @Composable
-fun Icono(url: Any, valor: Int) {
+fun Icon(url: Any, valor: Int) {
     Icon(
         painter = rememberImagePainter(url),
         contentDescription = null,
@@ -18,7 +18,7 @@ fun Icono(url: Any, valor: Int) {
 }
 
 @Composable
-fun IconoVector(url: ImageVector, valor: Int) {
+fun IconVector(url: ImageVector, valor: Int) {
     Icon(
         imageVector = url,
         contentDescription = null,

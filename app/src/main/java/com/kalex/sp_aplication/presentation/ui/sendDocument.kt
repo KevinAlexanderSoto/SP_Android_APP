@@ -6,62 +6,83 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.widget.Toast
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.*
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.kalex.sp_aplication.R
 import com.kalex.sp_aplication.camara.CameraCapture
-import com.kalex.sp_aplication.common.getCapturedImage
-import com.kalex.sp_aplication.common.getGalleryImage
+import com.kalex.sp_aplication.galeria.GallerySelect
 import com.kalex.sp_aplication.presentation.composables.ButtonText
+import com.kalex.sp_aplication.presentation.composables.DocumentationForm
 import com.kalex.sp_aplication.presentation.composables.Drawer
-import com.kalex.sp_aplication.presentation.composables.Icono
-import com.kalex.sp_aplication.presentation.composables.Imagen
+import com.kalex.sp_aplication.presentation.composables.Icon
+import com.kalex.sp_aplication.presentation.composables.Image
+import com.kalex.sp_aplication.presentation.composables.SophosLoadingIndicator
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
-import com.kalex.sp_aplication.presentation.validations.getFileSizeFloat
-import com.kalex.sp_aplication.presentation.validations.validarString
 import com.kalex.sp_aplication.presentation.viewModels.OficesViewModel
 import com.kalex.sp_aplication.presentation.viewModels.PostDocumentViewModel
-import com.kalex.usodecamara.galeria.GallerySelect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-import kotlin.collections.ArrayList
 
 @ExperimentalPermissionsApi
 @Composable
@@ -71,7 +92,7 @@ fun EnviarDocumento(
     postDocumentViewModel: PostDocumentViewModel = hiltViewModel(),
 ) {
     val resp = oficesViewModel.state.value
-    val correo = oficesViewModel.correo
+    val email = oficesViewModel.correo
     // para barra lateral
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -80,31 +101,21 @@ fun EnviarDocumento(
 
     // barra de cargando
     if (resp.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .fillMaxSize(0.1f),
-
-            )
-        }
+        SophosLoadingIndicator()
     }
     // Logica para obtener ciudades de la API
     if (!resp.isLoading) {
-        val ciudades = ArrayList<String>()
+        val cities = ArrayList<String>()
         for (ciudad in resp.ofices?.Items!!) {
-            if (!ciudades.contains(ciudad.Ciudad)) {
-                ciudades.add(ciudad.Ciudad) }
+            if (!cities.contains(ciudad.Ciudad)) cities.add(ciudad.Ciudad)
         }
 
         ToolBar(
             navController,
-            ciudades,
+            cities,
             scope,
             scaffoldState,
-            correo,
+            email,
             postDocumentViewModel,
         )
     }
@@ -155,132 +166,10 @@ fun ToolBar(
         drawerGesturesEnabled = true,
 
     ) {
-        FormularioDoc(ciudades, correo, postDocumentViewModel)
+        DocumentationForm(ciudades, correo, postDocumentViewModel)
     }
 }
 
-@ExperimentalPermissionsApi
-@Composable
-fun FormularioDoc(
-    ciudades: ArrayList<String>,
-    correo: String,
-    postDocumentViewModel: PostDocumentViewModel,
-
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()), // para hacer scroll
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        // ------------------------------------Formulario---------------------------------
-        val listaDocumento = listOf("CC", "TI", "CE", "PA")
-        val listaTipoAdjunto = listOf("Certificado de cuenta", "Cédula", "Factura", "Incapacidad")
-        // manejar focus de los texto,
-        val localFocusManager = LocalFocusManager.current
-        Spacer(Modifier.size(4.dp))
-
-        val menu1 = dropDownMenu(listaDocumento, nombreInput = "Tipo de Documento")
-        val text1: String = InputText(label = "Numero de documento", onAction = {
-            // bajar al siguiente field
-            localFocusManager.moveFocus(FocusDirection.Down)
-        })
-        val text2 = InputText(label = "Nombre", onAction = {
-            // bajar al siguiente field
-            localFocusManager.moveFocus(FocusDirection.Down)
-        })
-        val text3 = InputText(label = "Apellido", onAction = {
-            // bajar al siguiente field
-            localFocusManager.moveFocus(FocusDirection.Down)
-        })
-        val text4 = InputText(label = "Correo", correo, onAction = {
-            // bajar al siguiente field
-            localFocusManager.moveFocus(FocusDirection.Down)
-        })
-        val menu2 = dropDownMenu(ciudades, nombreInput = "Ciudad")
-        val menu3 = dropDownMenu(listaTipoAdjunto, nombreInput = "Tipo de Adjunto")
-
-        // ------------------------------------Para la foto---------------------------------
-        var tomarFoto = false
-        var cargarFoto = false
-        val context = LocalContext.current
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(4.dp),
-        ) {
-            cargarFoto = BtncargarImg("Cargar img", R.drawable.cloud_upload_24)
-
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-
-            tomarFoto = BtncargarImg("Tomar foto", R.drawable.add_a_photo_24)
-        }
-
-        var UriImg: Uri = Uri.parse("file://dev/null")
-
-        // inicializar variable Bitmap
-        var imgBitmap: Bitmap? = assetsToBitmap("ic_launcher_background", context)
-
-        println("Presiono botton foto : " + tomarFoto)
-        println("Presiono botton galeria : " + cargarFoto)
-
-// ----------------------Obtener foto desde La CAMARA---------------------------
-        if (tomarFoto && !cargarFoto) {
-            UriImg = capturaraImg(
-                modifier = Modifier,
-            )
-            if (UriImg != EMPTY_IMAGE_URI) {
-                imgBitmap = getCapturedImage(UriImg)
-            }
-        }
-// ----------------------Obtener foto desde Galeria---------------------------
-        if (cargarFoto) {
-            UriImg = capturaraImgGaleria(
-                modifier = Modifier,
-            )
-
-            if (UriImg != EMPTY_IMAGE_URI) {
-                imgBitmap = getGalleryImage(UriImg, context)
-            }
-        }
-
-// -------------------validaciones para habilitar enviar data---------------------------
-        var validacion: Boolean = false
-        if (imgBitmap != null) {
-            validacion = validarString(text1) && validarString(text2) && validarString(text3) && validarString(text4) && validarString(menu1) && validarString(menu2) && validarString(menu3)
-        }
-
-// -------------------Armado del body para Post Document---------------------------
-        // Crear Body para mandar
-        var requestBody: RequestBody? = null
-
-        if (validacion) {
-// -------------------Convertir Base 64---------------------------
-            val imgBse64 = imgBitmap?.toBase64String()
-            val imgBase64Encabezado = "data:image/jpeg;base64," + imgBse64
-
-            // Create JSON using JSONObject
-            val jsonObject = JSONObject()
-            jsonObject.put("TipoId", menu1)
-            jsonObject.put("Identificacion", text1)
-            jsonObject.put("Nombre", text2)
-            jsonObject.put("Apellido", text3)
-            jsonObject.put("Ciudad", menu2)
-            jsonObject.put("Correo", text4)
-            jsonObject.put("TipoAdjunto", menu3)
-            jsonObject.put("Adjunto", imgBase64Encabezado)
-
-            var jsonObjectString = jsonObject.toString()
-
-            requestBody = jsonObjectString.toRequestBody("application/json".toMediaTypeOrNull())
-        }
-
-        BtnEnviarImg(validacion, postDocumentViewModel, requestBody)
-    }
-}
 
 // Convertir a Bitmap desde el file name NO SE USA , PERO ES INTEREZANTE
 fun assetsToBitmap(fileName: String, context: Context): Bitmap? {
@@ -425,7 +314,7 @@ fun BtnEnviarImg(
             println(resp.value)
         }
 
-        Icono(R.drawable.send_24, 25)
+        Icon(R.drawable.send_24, 25)
         Spacer(Modifier.size(4.dp))
         ButtonText("Enviar", 20)
     }
@@ -453,7 +342,7 @@ fun BtncargarImg(
         ),
         enabled = true,
     ) {
-        Icono(icono, 20)
+        Icon(icono, 20)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         ButtonText(texto, 15)
     }
@@ -477,7 +366,7 @@ fun capturaraImg(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Imagen(
+            Image(
                 imageUri,
                 modifier = Modifier
                     .height(400.dp)
@@ -499,17 +388,6 @@ fun capturaraImg(
             modifier = modifier,
             onImageFile = { file ->
                 imageUri = file.toUri()
-                // -------------------validaciones para tamaño de imagenes---------------------------
-                val uriSize = imageUri.toFile().getFileSizeFloat()
-                // Validacion de Tamaño , pero no es necesaria , ya que al comprimir la IMG se setea el tamaño
-                   /* if (uriSize > 1000) {
-                        Toast.makeText(
-                            context,
-                            "Imagen demaciado pesada,toma otra foto",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        imageUri = EMPTY_IMAGE_URI
-                    }*/
             },
         )
     }
@@ -532,7 +410,7 @@ fun capturaraImgGaleria(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Imagen(
+            Image(
                 imageUri,
                 modifier = Modifier
                     .height(400.dp)

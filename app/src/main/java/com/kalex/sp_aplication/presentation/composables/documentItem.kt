@@ -16,29 +16,29 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DocumentListItem(
-    fecha: String,
-    TipoAdjunto: String,
-    idregistro: String,
-    nombre: String,
-    apellido: String,
+    date: String,
+    documentType: String,
+    id: String,
+    name: String,
+    lastName: String,
     onItemClick: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onItemClick(idregistro) }
+            .clickable { onItemClick(id) }
             .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column() {
-            val newFecha = fecha.split("T")
+            val newFecha = date.split("T")
             val vecFecha = newFecha[0].split("-")
             Text(
-                text = "${vecFecha[2]}/${vecFecha[1]}/${vecFecha[0]} - $TipoAdjunto ",
+                text = "${vecFecha[2]}/${vecFecha[1]}/${vecFecha[0]} - $documentType ",
                 style = MaterialTheme.typography.body1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(text = "$nombre " + "$apellido")
+            Text(text = "$name " + "$lastName")
         }
         Icon(
             Icons.Filled.KeyboardArrowRight,

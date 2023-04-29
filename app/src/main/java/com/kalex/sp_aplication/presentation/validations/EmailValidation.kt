@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.util.regex.Pattern
 
-class Emailvalidation() {
+class EmailValidation() {
     var correo by mutableStateOf("")
     private val errorMessage: String = "Correo no valido "
     var error by mutableStateOf<String?>(null)

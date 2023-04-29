@@ -1,6 +1,7 @@
 package com.kalex.sp_aplication.presentation.ui
 
-/*import android.widget.Toast
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,8 +12,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -27,83 +30,121 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.kalex.sp_aplication.R
+import com.kalex.sp_aplication.authentication.FingerPrintAuthentication
 import com.kalex.sp_aplication.presentation.composables.ButtonText
-import com.kalex.sp_aplication.presentation.composables.Icono
-import com.kalex.sp_aplication.presentation.composables.Imagen
+import com.kalex.sp_aplication.presentation.composables.Icon
+import com.kalex.sp_aplication.presentation.composables.Image
 import com.kalex.sp_aplication.presentation.theme.blanco
 import com.kalex.sp_aplication.presentation.theme.spcolor
-import com.kalex.sp_aplication.presentation.validations.Emailvalidation
-import com.kalex.sp_aplication.presentation.viewModels.UserViewModel
-import kotlinx.coroutines.delay
+import com.kalex.sp_aplication.presentation.validations.EmailValidation
+import com.kalex.sp_aplication.presentation.validations.states.UserState
+import com.kalex.sp_aplication.presentation.viewModels.AuthenticationViewModel
+import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.File*/
 
-
-/*
-@Composable fun SingIn(
+@RequiresApi(Build.VERSION_CODES.Q)
+@Composable
+fun SingIn(
     navController: NavController,
-    viewModel : UserViewModel = hiltViewModel(),
-    onfiger: () -> Unit
-){
+) {
+    val context = LocalContext.current
+    val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
+    val storedDataViewModel: DataViewModel = hiltViewModel()
+    val fingerPrintAuthentication: FingerPrintAuthentication = hiltViewModel()
+    val localFocusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),// para hacer scroll
+            .verticalScroll(rememberScrollState()), // para hacer scroll
         verticalArrangement = Arrangement.spacedBy(11.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Image(
+            url = R.drawable.logo_sophos_home,
+            modifier = Modifier
+                .height(210.dp)
+                .width(350.dp)
+                .padding(15.dp),
+        )
 
-        Imagen(url = R.drawable.logo_sophos_home, modifier = Modifier
-            .height(210.dp)
-            .width(350.dp)
-            .padding(15.dp) )
+        TextField("Ingresa tus datos para acceder")
 
-        Textfield("Ingresa tus datos para acceder")
-
-        // manejar focus de los texto,
-        val localFocusManager = LocalFocusManager.current
-
-        //state hoisting Email
-        val text = remember { Emailvalidation() }
+        // state hoisting Email
+        val text = remember { EmailValidation() }
 
         EmailField(
             text.correo,
             text.error,
-            onAction = {
-                // bajar al siguiente field
-                localFocusManager.moveFocus(FocusDirection.Down)
-            }
-        ){
-
+            onAction = { localFocusManager.moveFocus(FocusDirection.Down) },
+        ) {
             text.correo = it
             text.validate()
         }
 
-        //state hoisting Password
-        var password = remember { mutableStateOf("") }
-        PasswordFiels(password.value, onAction ={ localFocusManager.clearFocus()})
-        { password.value = it
+        // state hoisting Password
+        val password = remember { mutableStateOf("") }
+        PasswordFields(
+            password.value,
+            onAction = { localFocusManager.clearFocus() },
+        ) { password.value = it }
+
+        ButtonIn(
+            habilitado = text.valid(),
+        ) {
+            authenticationViewModel.getUser(text.correo, password.value)
+            handleAuthenticationState(authenticationViewModel.state.value) {
+                storedDataViewModel.saveAll(it, text.correo, password.value)
+                navController.navigate("home/$it")
+            }
+            // TODO: Take a look to the access in the user model response
         }
-
-        viewModel.getUser(text.correo,password.value)
-        //var resp = viewModel.state.value
-        Buttonin(habilitado = text.valid(),viewModel,navController,text.correo,password.value )
-
-        ButtonHuella(text.valid()){
-            onfiger()
-        }//,onfinger
+        val coroutineScope = rememberCoroutineScope()
+        FingerPrintButton(
+            checkStoredCredentials(
+                storedDataViewModel.email,
+                storedDataViewModel.password,
+            ),
+        ) {
+            fingerPrintAuthentication.launchBiometric()
+            coroutineScope.launch {
+                fingerPrintAuthentication.authenticationResult.collectLatest {
+                    if (it) {
+                        authenticationViewModel.getUser(
+                            storedDataViewModel.email.value,
+                            storedDataViewModel.password.value,
+                        )
+                        if (!authenticationViewModel.state.value.isLoading) {
+                            val currentUserName =
+                                authenticationViewModel.state.value.user?.nombre ?: ""
+                            storedDataViewModel.saveUserName(currentUserName)
+                            navController.navigate("home/$currentUserName")
+                        }
+                    }
+                }
+            }
+        }
     }
-
-
 }
 
+fun handleAuthenticationState(value: UserState, onSuccessState: (String) -> Unit) {
+    if (value.isLoading) {
+        // CircularProgressIndicator()
+    } else {
+        onSuccessState(value.user?.nombre ?: "")
+    }
+}
+
+fun checkStoredCredentials(email: State<String>, password: State<String>) =
+    email.value.isNotEmpty() && password.value.isNotEmpty()
+
 @Composable
-fun Textfield(texto: String ) {
-    Text(text = texto,
+fun TextField(texto: String) {
+    Text(
+        text = texto,
         style = MaterialTheme.typography.h6,
-        color = colors.secondary
+        color = colors.secondary,
     )
 }
 
@@ -112,157 +153,120 @@ fun EmailField(
     text: String,
     error: String?,
     onAction: () -> Unit,
-    onEmailChanged: (String) -> Unit
+    onEmailChanged: (String) -> Unit,
 ) {
-
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-
-    TextField(
-        value = text,
-        singleLine = true,
-        onValueChange = { onEmailChanged(it)},
-        label = { Text(text = "Email") },
-        placeholder = { Text("example@gmail.com") },
-        modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth(0.9f),
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            textColor = colors.secondary
-        ),
-        shape = RoundedCornerShape(9.dp),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Next
-            ) ,
-        keyboardActions = KeyboardActions (onNext = {
-            onAction()
-        }),
-        isError = error != null
-    )
-        error?.let{ FielError(it) }
+        TextField(
+            value = text,
+            singleLine = true,
+            onValueChange = { onEmailChanged(it) },
+            label = { Text(text = "Email") },
+            placeholder = { Text("example@gmail.com") },
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth(0.9f),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                textColor = colors.secondary,
+            ),
+            shape = RoundedCornerShape(9.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                onAction()
+            }),
+            isError = error != null,
+        )
+        error?.let { FieldError(it) }
     }
 }
 
 @Composable
-fun FielError(it: String) {
+fun FieldError(it: String) {
     Text(
         text = it,
-        style = TextStyle(color =colors.error)
+        style = TextStyle(color = colors.error),
     )
 }
 
 @Composable
-fun PasswordFiels(
+fun PasswordFields(
     pass: String,
     onAction: () -> Unit,
-    onPasswordChange: (String) -> Unit
+    onPasswordChange: (String) -> Unit,
 ) {
     TextField(
         value = pass,
         onValueChange = { onPasswordChange(it) },
-        label = { Text("Contraseña" ) },
+        label = { Text("Contraseña") },
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth(0.9f),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            textColor = colors.secondary
+            textColor = colors.secondary,
         ),
         shape = RoundedCornerShape(9.dp),
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ) ,
-        keyboardActions = KeyboardActions (onDone = {
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(onDone = {
             onAction()
         }),
 
-    )
+        )
 }
 
 @Composable
-fun Buttonin(
+fun ButtonIn(
     habilitado: Boolean,
-    viewModel: UserViewModel,
-    navController: NavController,
-    correo: String,
-    contraseña :String
+    onClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     Button(
         onClick = {
-            runBlocking {
-                launch {
-                    delay(100L)
-                }
-            }
-
-            var resp = viewModel.state.value
-
-               //println("Respuesta de server: $resp")
-                resp.user?.let {user ->
-                    val acceso = user.acceso
-                    println("acceso $acceso")
-                    // println("respuesta${resp.user}")
-                    if (acceso == true){
-
-                        Toast.makeText(context,"Acceso concedido",Toast.LENGTH_LONG).show()
-                        viewModel.saveAll(nombre = user.nombre,correo = correo, contraseña = contraseña)
-                        navController.navigate("home/${resp.user?.nombre}")
-
-                    }else if(acceso == false){
-                        Toast.makeText(context,"El Correo o la Contraseña son incorrectos",Toast.LENGTH_LONG).show()
-
-                    }
-
-                }
-
-
-
-                  },
+            onClick.invoke()
+        },
         modifier = Modifier
             .padding(top = 30.dp)
-            .fillMaxWidth(0.8f)
-        ,
+            .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(23.dp),
         contentPadding = PaddingValues(12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = spcolor,
-            contentColor = blanco
+            contentColor = blanco,
         ),
-        enabled = habilitado
+        enabled = habilitado,
     ) {
-
-        Icono(R.drawable.outline_login_24,30)
+        Icon(R.drawable.outline_login_24, 30)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar",22)
-
+        ButtonText("Ingresar", 22)
     }
-    //if(resp.isLoading) CircularProgressIndicator()
+
 }
 
-
 @Composable
-fun ButtonHuella(habilitado: Boolean,onfiger: () -> Unit) {//,
+fun FingerPrintButton(habilitate: Boolean, onButtonClick: () -> Unit) { // ,
     OutlinedButton(
-        onClick = { onfiger() },
+        onClick = { onButtonClick() },
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth(0.8f),
         border = BorderStroke(1.dp, Color.Black),
         contentPadding = PaddingValues(12.dp),
         shape = RoundedCornerShape(23.dp),
-        //enabled = habilitado
+        enabled = habilitate,
     ) {
-        Icono(R.drawable.baseline_fingerprint_24,35)
+        Icon(R.drawable.baseline_fingerprint_24, 35)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        ButtonText("Ingresar con huella",22)
+        ButtonText("Ingresar con huella", 22)
     }
-}*/
+}

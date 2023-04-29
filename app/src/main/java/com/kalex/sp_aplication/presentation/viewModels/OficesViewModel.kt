@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.maps.model.LatLng
 import com.kalex.sp_aplication.common.Resource
 import com.kalex.sp_aplication.data.dataStore.SettingsDataStore
-import com.kalex.sp_aplication.domain.use_case.get_ofices.GetOficesUseCase
+import com.kalex.sp_aplication.domain.use_case.get_ofices.GetOfficesUseCase
 import com.kalex.sp_aplication.presentation.validations.states.OficeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OficesViewModel @Inject constructor(
-    private val getOficesUseCase: GetOficesUseCase,
+    private val getOfficesUseCase: GetOfficesUseCase,
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
@@ -28,14 +28,14 @@ class OficesViewModel @Inject constructor(
 
     init {
         val settingsPrefs = settingsDataStore.settingsPrefsFlow.onEach { result ->
-            correo = result.correo
+            correo = result.EMAIL
         }.launchIn(viewModelScope)
 
         getOfices()
     }
 
     private fun getOfices() {
-        getOficesUseCase().onEach { result ->
+        getOfficesUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = OficeState(ofices = result.data)

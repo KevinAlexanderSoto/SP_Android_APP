@@ -1,17 +1,26 @@
 package com.kalex.sp_aplication.presentation.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,7 +29,7 @@ import androidx.navigation.NavHostController
 import com.kalex.sp_aplication.data.remote.dto.ItemDocDto
 import com.kalex.sp_aplication.presentation.composables.DocumentListItem
 import com.kalex.sp_aplication.presentation.composables.Drawer
-import com.kalex.sp_aplication.presentation.viewModels.DataViewModel
+import com.kalex.sp_aplication.presentation.composables.SophosLoadingIndicator
 import com.kalex.sp_aplication.presentation.viewModels.DocumentViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,30 +38,16 @@ import kotlinx.coroutines.launch
 fun VerDocumentos(
     navController: NavHostController,
     viewModel: DocumentViewModel = hiltViewModel(),
-    viewmodelData: DataViewModel = hiltViewModel(),
 ) {
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     )
     val scope = rememberCoroutineScope()
     // get documentos
-
-   /* var correo = viewmodelData.correo
-    viewModel.getDocuments(correo)*/
-
-    var resp = viewModel.state.value
+    val resp = viewModel.state.value
     // barra de cargando
     if (resp.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .fillMaxSize(0.1f),
-
-            )
-        }
+        SophosLoadingIndicator()
     }
 
     if (!resp.isLoading) {
@@ -73,7 +68,7 @@ fun VerDocumentos(
         )
     }
 }
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ToolBarVerDocs(
     navController: NavHostController,
@@ -122,11 +117,11 @@ fun ToolBarVerDocs(
                     it
                     item {
                         DocumentListItem(
-                            fecha = it.Fecha,
-                            TipoAdjunto = it.TipoAdjunto,
-                            idregistro = it.IdRegistro,
-                            nombre = it.Nombre,
-                            apellido = it.Apellido,
+                            date = it.Fecha,
+                            documentType = it.TipoAdjunto,
+                            id = it.IdRegistro,
+                            name = it.Nombre,
+                            lastName = it.Apellido,
                             onItemClick = { it ->
                                 val idregistro = it
                                 navController.navigate("getdocdetail/$idregistro")

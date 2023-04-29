@@ -10,13 +10,13 @@ import java.io.IOException
 import javax.inject.Inject
 
 class GetDocumentDetailUseCase @Inject constructor(
-    private val repository: UserRepository, // injectamos la interface
+    private val repository: UserRepository,
 ) {
-    operator fun invoke(idRegistro: String): Flow<Resource<DocumentDto>> = flow {
+    operator fun invoke(id: String): Flow<Resource<DocumentDto>> = flow {
         try {
             emit(Resource.Loading<DocumentDto>())
 
-            val document = repository.getDocumentDetail(idRegistro)
+            val document = repository.getDocumentDetail(id)
 
             emit(Resource.Success<DocumentDto>(document))
         } catch (e: HttpException) {
