@@ -75,14 +75,6 @@ fun VerOficinas(
                         Text("Open Settings")
                     }
                     // If they don't want to grant permissions, this button will result in going back
-                    /*Button(
-                        modifier = Modifier.padding(4.dp),
-                        onClick = {
-                            //TODO:
-                        }
-                    ) {
-                        Text("Use Camera")
-                    }*/
                 }
             }
         },

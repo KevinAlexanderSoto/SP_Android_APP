@@ -40,7 +40,7 @@ fun Navigation() {
                 backStackEntry ->
             val idRegistro = backStackEntry.arguments?.getString("idRegistro")
             requireNotNull(idRegistro)
-            VerDocumento(navController, idRegistro = idRegistro)
+            VerDocumento(navController)
         }
         composable(Constants.officesNavItem) {
             VerOficinas(navController)

@@ -5,12 +5,10 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.kalex.sp_aplication.presentation.composables.Drawer
+import com.kalex.sp_aplication.presentation.composables.SophosLoadingIndicator
 import com.kalex.sp_aplication.presentation.viewModels.DocumentDetailViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -43,7 +42,6 @@ import kotlinx.coroutines.launch
 fun VerDocumento(
     navController: NavHostController,
     viewModel: DocumentDetailViewModel = hiltViewModel(),
-    idRegistro: String,
 ) {
     // para menu desplegable
     val scaffoldState = rememberScaffoldState(
@@ -56,16 +54,7 @@ fun VerDocumento(
 
     // barra de cargando
     if (resp.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .fillMaxSize(0.1f),
-
-            )
-        }
+        SophosLoadingIndicator()
     }
 
     if (!resp.isLoading) {

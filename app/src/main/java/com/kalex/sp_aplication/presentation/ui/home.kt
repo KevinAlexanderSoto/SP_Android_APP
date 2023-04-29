@@ -1,5 +1,6 @@
 package com.kalex.sp_aplication.presentation.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,18 +25,20 @@ import com.kalex.sp_aplication.presentation.theme.color3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Composable fun Home(
+@Composable
+fun Home(
     navController: NavController,
-    nombre: String,
+    name: String,
 ) {
     val scaffoldState = rememberScaffoldState(
         drawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     )
     val scope = rememberCoroutineScope()
 
-    ToolBar(nombre = nombre, navController, scope, scaffoldState)
+    ToolBar(nombre = name, navController, scope, scaffoldState)
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ToolBar(
     nombre: String,
@@ -66,7 +69,6 @@ fun ToolBar(
         drawerGesturesEnabled = true,
 
     ) {
-            padding ->
         Contenido(navController)
     }
 }
@@ -126,7 +128,6 @@ fun Card(
 ) {
     Card(
         elevation = 8.dp,
-        // border = BorderStroke(0.5.dp, Color.Black),
         shape = RoundedCornerShape(17.dp),
         modifier = Modifier
             .fillMaxWidth(0.9f),
