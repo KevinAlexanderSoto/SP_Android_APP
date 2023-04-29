@@ -3,14 +3,22 @@ aplicación móvil en la cual se permita el envío de documentación a Sophos, c
 
 Caracteristicas
 ----------
-login
+## login
+
 ![](https://i.postimg.cc/tJctqc1p/singIn.png)
-home
+
+## home
+
 ![](https://i.postimg.cc/7PtNn5Kd/home.png)
-send Doc
+
+## send Doc
+
 ![](https://i.postimg.cc/pXgY3gbB/SendDoc.png)
-see Doc
+
+## see Doc
+
 ![](https://i.postimg.cc/ncsGRn5z/SeeDoc.png)
-map
+
+## map
 
 ![](https://i.postimg.cc/FH3gvDhX/map.png)
